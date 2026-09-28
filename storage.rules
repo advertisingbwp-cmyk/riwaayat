@@ -1,0 +1,13 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /owners/{uid}/events/{eventId}/photos/{photoId} {
+      allow read: if request.auth != null && request.auth.uid == uid && request.auth.token.email_verified == true
+        && (!firestore.exists(/databases/(default)/documents/owners/$(uid))
+          || (!('deletionJob' in firestore.get(/databases/(default)/documents/owners/$(uid)).data)
+            && !('closed' in firestore.get(/databases/(default)/documents/owners/$(uid)).data)));
+      allow write: if false;
+    }
+    match /{path=**} { allow read, write: if false; }
+  }
+}

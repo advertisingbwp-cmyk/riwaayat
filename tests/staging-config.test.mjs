@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateStagingConfig} from '../scripts/staging-config.mjs';
+const valid={VITE_SITE_URL:'https://riwaayat-staging.vercel.app',VITE_FIREBASE_EMULATORS:'false',VITE_FIREBASE_PROJECT_ID:'riwaayat-test-new',VITE_FIREBASE_API_KEY:'AIza'+'a'.repeat(35),VITE_FIREBASE_AUTH_DOMAIN:'riwaayat-test-new.firebaseapp.com',VITE_FIREBASE_STORAGE_BUCKET:'riwaayat-test-new.firebasestorage.app',VITE_FIREBASE_APP_ID:'1:123456:web:abcdef',VITE_FIREBASE_APPCHECK_SITE_KEY:'test-only'};
+test('staging preflight accepts consistent config without treating it as service verification',()=>assert.deepEqual(validateStagingConfig(valid),[]));
+test('staging rejects emulator settings, missing values and the old project',()=>{assert.ok(validateStagingConfig({}).length);assert.ok(validateStagingConfig({...valid,VITE_FIREBASE_EMULATORS:'true'}).length);for(const id of ['demo-riwaayat','wedding-28db4'])assert.ok(validateStagingConfig({...valid,VITE_FIREBASE_PROJECT_ID:id}).some(e=>e.includes('NEW Firebase')));});
+test('staging rejects mixed projects and frontend server secrets',()=>{assert.ok(validateStagingConfig({...valid,VITE_FIREBASE_STORAGE_BUCKET:'wedding-28db4.appspot.com'}).length);assert.ok(validateStagingConfig({...valid,VITE_FIREBASE_AUTH_DOMAIN:'wedding-28db4.firebaseapp.com'}).length);assert.ok(validateStagingConfig({...valid,VITE_RESEND_API_KEY:'test-only'}).some(e=>e.includes('server-only')));});
+test('staging origin must be HTTPS without credentials, path or query',()=>{for(const url of ['http://localhost:5173','https://example.com','https://a.test/path','https://user:password@a.test','https://a.test/?token=test'])assert.ok(validateStagingConfig({...valid,VITE_SITE_URL:url}).length);});

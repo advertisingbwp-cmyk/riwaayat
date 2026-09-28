@@ -1,0 +1,2 @@
+export function csvCell(value){const raw=String(value??'');const safe=/^[\s\u0000-\u001f]*[=+\-@]/.test(raw)||/^[\t\r\n]/.test(raw)?"'"+raw:raw;return '"'+safe.replaceAll('"','""')+'"';}
+export function repliesCsv(rows){const header=['Name','Attendance','Party size','Meal','Ceremonies','Private note'];return '\uFEFF'+[header,...rows.map(r=>[r.name,r.attendance,r.partySize,r.meal||'',(r.ceremonyNames||[]).join('; '),r.note])].map(row=>row.map(csvCell).join(',')).join('\r\n');}

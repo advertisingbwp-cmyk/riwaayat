@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function active(uid) { return !exists(/databases/$(database)/documents/owners/$(uid)) || (!('deletionJob' in get(/databases/$(database)/documents/owners/$(uid)).data) && !('closed' in get(/databases/$(database)/documents/owners/$(uid)).data)); }
+    function owner(uid) { return request.auth != null && request.auth.uid == uid && request.auth.token.email_verified == true && active(uid); }
+    match /owners/{uid}/events/{eventId} {
+      allow read: if owner(uid);
+      allow write: if false;
+      match /rsvps/{replyId} { allow read: if owner(uid); allow write: if false; }
+      match /guestbook/{entryId} { allow read: if owner(uid); allow write: if false; }
+      match /photos/{photoId} { allow read: if owner(uid); allow write: if false; }
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
