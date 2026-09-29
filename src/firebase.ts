@@ -3,7 +3,6 @@ import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-ch
 import { getAuth, connectAuthEmulator, browserSessionPersistence, setPersistence } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
-import { getStorage, connectStorageEmulator } from 'firebase/storage';
 const env=import.meta.env;
 const config={apiKey:env.VITE_FIREBASE_API_KEY,authDomain:env.VITE_FIREBASE_AUTH_DOMAIN,projectId:env.VITE_FIREBASE_PROJECT_ID,storageBucket:env.VITE_FIREBASE_STORAGE_BUCKET,appId:env.VITE_FIREBASE_APP_ID};
 export const emulatorMode=env.VITE_FIREBASE_EMULATORS==='true';
@@ -12,10 +11,10 @@ function connect(){
   if(configurationError)return null;
   const app=initializeApp(config);
   if(!emulatorMode)initializeAppCheck(app,{provider:new ReCaptchaEnterpriseProvider(env.VITE_FIREBASE_APPCHECK_SITE_KEY),isTokenAutoRefreshEnabled:true});
-  const auth=getAuth(app),db=getFirestore(app),functions=getFunctions(app,'us-central1'),storage=getStorage(app);
-  if(emulatorMode){connectAuthEmulator(auth,'http://127.0.0.1:9098',{disableWarnings:true});connectFirestoreEmulator(db,'127.0.0.1',8086);connectFunctionsEmulator(functions,'127.0.0.1',5002);connectStorageEmulator(storage,'127.0.0.1',9198);}
+  const auth=getAuth(app),db=getFirestore(app),functions=getFunctions(app,'us-central1');
+  if(emulatorMode){connectAuthEmulator(auth,'http://127.0.0.1:9098',{disableWarnings:true});connectFirestoreEmulator(db,'127.0.0.1',8086);connectFunctionsEmulator(functions,'127.0.0.1',5002);}
   const ready=setPersistence(auth,browserSessionPersistence);
-  return {auth,db,functions,storage,ready};
+  return {auth,db,functions,ready};
 }
 export const services=connect();
 export function friendlyError(error:unknown){
