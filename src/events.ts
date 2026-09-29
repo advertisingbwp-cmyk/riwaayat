@@ -8,6 +8,9 @@ export type InvitationEvent = {
   story: {year: string; title: string; text: string}[];
   ceremonies: {id: string; title: string; startsAt: string; place: string; attire: string}[];
   gallery: {src: string; alt: string}[];
+  venueImage?: string;
+  imagePosition?: string;
+  venueImagePosition?: string;
 };
 
 export const invitationEvents: InvitationEvent[] = [

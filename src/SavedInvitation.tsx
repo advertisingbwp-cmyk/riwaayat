@@ -35,7 +35,7 @@ export default function SavedInvitation({id,owner=false}:{id:string;owner?:boole
     setAccess({id,token:id,rsvpOpen:data.guestSettings?.rsvpOpen!==false,guestbookOpen:data.guestSettings?.guestbookOpen!==false});
     if(data.content&&data.templateId){
      const images:Record<string,string>={};
-     const photoIds=[...new Set([data.content.imagePhotoId,...data.content.galleryPhotoIds].filter((p):p is string=>!!p))];
+     const photoIds=[...new Set([data.content.imagePhotoId,data.content.venuePhotoId,...data.content.galleryPhotoIds].filter((p):p is string=>!!p))];
      for(const pid of photoIds){
       try{
        const psnap=await getDoc(doc(services!.db,'owners',data.ownerId,'events',id,'photos',pid));
