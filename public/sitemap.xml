@@ -6,6 +6,31 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://riwaayat-venue.vercel.app/blog</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://riwaayat-venue.vercel.app/blog/digital-wedding-invitation-vs-physical-cards</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://riwaayat-venue.vercel.app/blog/wedding-whatsapp-group-vs-wedding-website</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://riwaayat-venue.vercel.app/blog/wedding-rsvp-tracking-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://riwaayat-venue.vercel.app/blog/noor-e-nikah-digital-invitation-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://riwaayat-venue.vercel.app/preview/royal</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

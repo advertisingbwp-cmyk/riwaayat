@@ -5,6 +5,7 @@ Allow: /preview/
 Allow: /privacy
 Allow: /terms
 Allow: /contact
+Allow: /blog/
 Allow: /images/
 
 # Disallow private accounts, workspaces, and drafts
