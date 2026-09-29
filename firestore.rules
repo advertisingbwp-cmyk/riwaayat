@@ -1,28 +1,42 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // 1. Private Workspace: Only the account owner can read/write their own drafts and photos
     match /owners/{uid}/events/{eventId} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
+      
       match /photos/{photoId} {
         allow read, write: if request.auth != null && request.auth.uid == uid;
       }
       match /rsvps/{replyId} {
-        allow read, write: if request.auth != null;
+        allow read, write: if request.auth != null && request.auth.uid == uid;
       }
       match /guestbook/{entryId} {
-        allow read, write: if request.auth != null;
+        allow read, write: if request.auth != null && request.auth.uid == uid;
       }
     }
+    
+    // 2. Public Published Invitation: Anyone can read, but only the event owner can modify or delete
     match /events/{eventId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
+      
+      // Guests can submit an RSVP, but ONLY the host/owner can read all guest RSVPs
       match /rsvps/{replyId} {
-        allow read, write: if true;
+        allow create: if true;
+        allow read, update, delete: if request.auth != null && get(/databases/$(database)/documents/events/$(eventId)).data.ownerId == request.auth.uid;
       }
+      
+      // Guests can leave a guestbook message, public can only see approved ones, host moderates
       match /guestbook/{entryId} {
-        allow read, write: if true;
+        allow create: if true;
+        allow read: if resource.data.status == 'approved' || (request.auth != null && get(/databases/$(database)/documents/events/$(eventId)).data.ownerId == request.auth.uid);
+        allow update, delete: if request.auth != null && get(/databases/$(database)/documents/events/$(eventId)).data.ownerId == request.auth.uid;
       }
     }
+    
     match /{document=**} {
       allow read, write: if false;
     }
