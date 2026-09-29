@@ -30,7 +30,6 @@ function App() {
   const filtered = designs.filter(d => filter === 'All celebrations' || d.category === filter);
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
-    <div className="announcement">Beautiful beginnings, thoughtfully reimagined. <span>THE NEW RIWAAYAT · DESIGN PREVIEW</span></div>
     <header className="site-header"><div className="nav-shell"><Brand/><button className="menu-toggle" aria-expanded={menu} aria-controls="main-nav" onClick={() => setMenu(!menu)}>{menu ? 'Close ×' : 'Menu ☰'}</button><nav id="main-nav" aria-label="Main navigation" className={menu ? 'nav-open' : ''}>
       <a href="#designs" onClick={() => setMenu(false)}>The collection</a><a href="#how-it-works" onClick={() => setMenu(false)}>How it works</a><a href="#experience" onClick={() => setMenu(false)}>The little details</a><button className="nav-cta" onClick={() => { setMenu(false); location.assign('/account'); }}>Create an invitation <span aria-hidden="true">↗</span></button>
     </nav></div></header>
