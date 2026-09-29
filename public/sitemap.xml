@@ -31,6 +31,36 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://riwaayat-venue.vercel.app/blog/how-to-make-a-wedding-website</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://riwaayat-venue.vercel.app/blog/do-you-need-a-wedding-website</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://riwaayat-venue.vercel.app/blog/wedding-invitation-website-prices</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://riwaayat-venue.vercel.app/blog/destination-wedding-website-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://riwaayat-venue.vercel.app/blog/royal-baraat-invitation-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://riwaayat-venue.vercel.app/blog/bloom-mehndi-walima-invitation-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://riwaayat-venue.vercel.app/preview/royal</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

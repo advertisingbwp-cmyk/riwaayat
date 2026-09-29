@@ -7,12 +7,78 @@ export default function Blog({ slug }: { slug?: string }) {
   const post = slug ? blogPosts.find(p => p.slug === slug) : null;
 
   useEffect(() => {
+    const origTitle = document.title;
+    const descMeta = document.querySelector('meta[name="description"]');
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    const canonical = document.querySelector('link[rel="canonical"]');
+
+    const origDesc = descMeta?.getAttribute('content') || '';
+    const origOgTitle = ogTitle?.getAttribute('content') || '';
+    const origOgDesc = ogDesc?.getAttribute('content') || '';
+    const origOgUrl = ogUrl?.getAttribute('content') || '';
+    const origCanonical = canonical?.getAttribute('href') || '';
+
+    let scriptEl: HTMLScriptElement | null = null;
+
     if (post) {
+      const pageUrl = `https://riwaayat-venue.vercel.app/blog/${post.slug}`;
       document.title = `${post.title} — Riwaayat Guides`;
+      descMeta?.setAttribute('content', post.excerpt);
+      ogTitle?.setAttribute('content', `${post.title} — Riwaayat Guides`);
+      ogDesc?.setAttribute('content', post.excerpt);
+      ogUrl?.setAttribute('content', pageUrl);
+      canonical?.setAttribute('href', pageUrl);
+
+      // JSON-LD Article Schema
+      scriptEl = document.createElement('script');
+      scriptEl.type = 'application/ld+json';
+      scriptEl.id = 'article-ld-json';
+      scriptEl.textContent = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: post.title,
+        description: post.excerpt,
+        author: {
+          '@type': 'Organization',
+          name: 'Riwaayat'
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Riwaayat',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://riwaayat-venue.vercel.app/images/royal.webp'
+          }
+        },
+        datePublished: '2026-09-01',
+        mainEntityOfPage: pageUrl
+      });
+      document.head.appendChild(scriptEl);
     } else {
-      document.title = 'Wedding & Celebration Guides — Riwaayat';
+      const hubUrl = 'https://riwaayat-venue.vercel.app/blog';
+      document.title = 'Wedding & Celebration Guides, Etiquette & Ideas — Riwaayat';
+      descMeta?.setAttribute('content', 'Explore guides on digital wedding invitations, online RSVP management, ceremony etiquette, and Pakistani wedding traditions.');
+      ogTitle?.setAttribute('content', 'Wedding & Celebration Guides — Riwaayat');
+      ogDesc?.setAttribute('content', 'Explore guides on digital wedding invitations, online RSVP management, ceremony etiquette, and Pakistani wedding traditions.');
+      ogUrl?.setAttribute('content', hubUrl);
+      canonical?.setAttribute('href', hubUrl);
     }
+
     window.scrollTo(0, 0);
+
+    return () => {
+      document.title = origTitle;
+      descMeta?.setAttribute('content', origDesc);
+      ogTitle?.setAttribute('content', origOgTitle);
+      ogDesc?.setAttribute('content', origOgDesc);
+      ogUrl?.setAttribute('content', origOgUrl);
+      canonical?.setAttribute('href', origCanonical);
+      if (scriptEl && scriptEl.parentNode) {
+        scriptEl.parentNode.removeChild(scriptEl);
+      }
+    };
   }, [post]);
 
   if (slug && !post) {
