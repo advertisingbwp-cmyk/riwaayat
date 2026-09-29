@@ -1,0 +1,19 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Allow: /preview/
+Allow: /privacy
+Allow: /terms
+Allow: /contact
+Allow: /images/
+
+# Disallow private accounts, workspaces, and drafts
+Disallow: /account
+Disallow: /draft/
+Disallow: /edit/
+Disallow: /responses/
+Disallow: /data-controls
+Disallow: /data-request
+
+# Sitemap location
+Sitemap: https://riwaayat-venue.vercel.app/sitemap.xml
