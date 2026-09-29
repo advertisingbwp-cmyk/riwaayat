@@ -5,6 +5,7 @@ import {services,configurationError} from './firebase';
 import {Invitation} from './Invitation';
 import {GuestResponses,type GuestAccess} from './GuestResponses';
 import {toInvitation,type Content,type SavedDraft} from './editor-model';
+import {decryptPayload,type EncryptedPayload} from './crypto-payload';
 import type {InvitationEvent} from './events';
 import './account.css';
 export default function SavedInvitation({id,owner=false}:{id:string;owner?:boolean}){
@@ -15,7 +16,11 @@ export default function SavedInvitation({id,owner=false}:{id:string;owner?:boole
   let active=true,epoch=0;
   setEvent(null);setError('');setBusy(true);
   async function display(template:InvitationEvent['id'],content:Content,images:Record<string,string>={},expected=epoch){
-   if(active&&expected===epoch)setEvent(toInvitation(template,content,images));
+   if(active&&expected===epoch){
+     const inv = toInvitation(template,content,images);
+     setEvent(inv);
+     if(inv.couple) document.title = `${inv.couple} · ${inv.name}`;
+   }
   }
   async function guest(){
    try{
@@ -26,25 +31,44 @@ export default function SavedInvitation({id,owner=false}:{id:string;owner?:boole
      return;
     }
     const data=snap.data();
-    if(data.access==='passcode'&&data.passcode!==passcode){
-     setLocked(true);
-     if(attempt>0)setError('Passcode incorrect. Try again.');
-     return;
-    }
-    setLocked(false);
-    setAccess({id,token:id,rsvpOpen:data.guestSettings?.rsvpOpen!==false,guestbookOpen:data.guestSettings?.guestbookOpen!==false});
-    if(data.content&&data.templateId){
-     const images:Record<string,string>={};
-     const photoIds=[...new Set([data.content.imagePhotoId,data.content.venuePhotoId,...data.content.galleryPhotoIds].filter((p):p is string=>!!p))];
-     for(const pid of photoIds){
-      try{
-       const psnap=await getDoc(doc(services!.db,'owners',data.ownerId,'events',id,'photos',pid));
-       if(psnap.exists()&&psnap.data().path){
-        images[pid]=psnap.data().path;
-       }
-      }catch{}
+    if(data.access==='passcode'){
+     if(!passcode){
+      setLocked(true);
+      return;
      }
-     await display(data.templateId,data.content,images);
+     if(!data.encryptedPayload){
+      setError('This invitation format is not supported.');
+      return;
+     }
+     try{
+      const decrypted=await decryptPayload<{content:Content;images?:Record<string,string>}>(passcode,data.encryptedPayload as EncryptedPayload);
+      setLocked(false);
+      setAccess({id,token:id,rsvpOpen:data.guestSettings?.rsvpOpen!==false,guestbookOpen:data.guestSettings?.guestbookOpen!==false});
+      await display(data.templateId,decrypted.content,decrypted.images||{});
+     }catch(err){
+      setLocked(true);
+      setError('Passcode incorrect. Please check and try again.');
+      return;
+     }
+    }else{
+     setLocked(false);
+     setAccess({id,token:id,rsvpOpen:data.guestSettings?.rsvpOpen!==false,guestbookOpen:data.guestSettings?.guestbookOpen!==false});
+     if(data.content&&data.templateId){
+      const images:Record<string,string>={};
+      const photoIds=[...new Set([data.content.imagePhotoId,data.content.venuePhotoId,...(data.content.galleryPhotoIds||[])].filter((p):p is string=>!!p))];
+      for(const pid of photoIds){
+       try{
+        let psnap=await getDoc(doc(services!.db,'events',id,'photos',pid));
+        if(!psnap.exists()&&data.ownerId){
+         psnap=await getDoc(doc(services!.db,'owners',data.ownerId,'events',id,'photos',pid));
+        }
+        if(psnap.exists()&&psnap.data().path){
+         images[pid]=psnap.data().path;
+        }
+       }catch{}
+      }
+      await display(data.templateId,data.content,images);
+     }
     }
    }catch(e){
     if(active)setError('This invitation could not be opened. It may be unpublished, or the service is unavailable.');

@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node --test tests/validation.test.mjs tests/csv.test.mjs tests/contact.test.mjs tests/staging-config.test.mjs",
+    "test": "node --test tests/validation.test.mjs tests/csv.test.mjs tests/contact.test.mjs tests/staging-config.test.mjs tests/crypto.test.mjs",
     "emulators": "firebase emulators:start --project demo-riwaayat --only auth,firestore,storage,functions",
     "test:security": "firebase emulators:exec --project demo-riwaayat --only auth,firestore,storage,functions \"node --test tests/rules.test.mjs tests/backend.test.mjs tests/deletion.test.mjs\"",
     "seed:demo": "node tests/seed-demo.mjs",
