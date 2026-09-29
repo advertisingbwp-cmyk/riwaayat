@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState,type FormEvent} from 'react';
-import {httpsCallable} from 'firebase/functions';
+import {collection,doc,onSnapshot,setDoc,serverTimestamp} from 'firebase/firestore';
 import {services,emulatorMode} from './firebase';
 import './responses.css';
 import type {InvitationEvent} from './events';
@@ -7,12 +7,47 @@ export type GuestAccess={id:string;token:string;rsvpOpen:boolean;guestbookOpen:b
 type Entry={id:string;displayName:string;message:string};
 export function responseError(error:unknown){const code=(error as {code?:string}).code||'';if(code.includes('permission-denied'))return 'Your guest access expired or the invitation changed. Reopen the invitation before sending; your current text is still here.';if(code.includes('failed-precondition'))return 'Submissions are closed or this request cannot be processed yet. Your text has been kept.';if(code.includes('invalid-argument'))return 'Check the form and select at least one listed ceremony when attending.';if(code.includes('resource-exhausted'))return 'The submission limit was reached. Wait a minute or contact your host.';return 'Your submission could not be confirmed. Please retry the same details.';}
 export function GuestResponses({event,access}:{event:InvitationEvent;access:GuestAccess}){
- const [attendance,setAttendance]=useState('yes'),[busy,setBusy]=useState(''),[error,setError]=useState(''),[receipt,setReceipt]=useState(''),[bookNotice,setBookNotice]=useState(''),[entries,setEntries]=useState<Entry[]>([]),[bookError,setBookError]=useState('');const attempts=useRef<Record<string,{key:string;id:string}>>({});const result=useRef<HTMLDivElement>(null);
- const base={id:access.id,token:access.token};
- useEffect(()=>{let alive=true;httpsCallable(services!.functions,'getGuestbook')(base).then(r=>{if(alive)setEntries((r.data as {entries:Entry[]}).entries);}).catch(()=>{if(alive)setBookError('Guestbook messages could not load.');});return()=>{alive=false;};},[access.id,access.token]);
+ const [attendance,setAttendance]=useState('yes'),[busy,setBusy]=useState(''),[error,setError]=useState(''),[receipt,setReceipt]=useState(''),[bookNotice,setBookNotice]=useState(''),[entries,setEntries]=useState<Entry[]>([]),[bookError,setBookError]=useState('');const result=useRef<HTMLDivElement>(null);
+ useEffect(()=>{
+  if(!services)return;
+  let alive=true;
+  return onSnapshot(collection(services.db,'events',access.id,'guestbook'),snap=>{
+   if(alive)setEntries(snap.docs.map(d=>({id:d.id,...d.data()} as Entry)).filter(e=>(e as any).status==='approved'));
+  },()=>{if(alive)setBookError('Guestbook messages could not load.');});
+ },[access.id]);
  useEffect(()=>{if(receipt)result.current?.focus();},[receipt]);
- async function send(name:string,data:Record<string,unknown>){const key=JSON.stringify(data);if(attempts.current[name]?.key!==key)attempts.current[name]={key,id:crypto.randomUUID()};return httpsCallable(services!.functions,name)({...base,...data,requestId:attempts.current[name].id});}
- async function rsvp(e:FormEvent<HTMLFormElement>){e.preventDefault();const form=new FormData(e.currentTarget);setBusy('rsvp');setError('');try{const data={name:String(form.get('name')),attendance,partySize:attendance==='yes'?Number(form.get('party')):0,meal:attendance==='yes'?String(form.get('meal')):null,ceremonies:attendance==='yes'?form.getAll('ceremonies'):[],note:String(form.get('note')||'')};const result=await send('submitRSVP',data);setReceipt((result.data as {id:string}).id);}catch(e){setError(responseError(e));}finally{setBusy('');}}
- async function book(e:FormEvent<HTMLFormElement>){e.preventDefault();const form=e.currentTarget,data=new FormData(form);setBusy('book');setBookNotice('');setBookError('');try{await send('submitGuestbook',{displayName:String(data.get('displayName')),message:String(data.get('message')),consent:data.get('consent')==='on'});setBookNotice('Message saved for host review. It will appear only if approved.');form.reset();delete attempts.current.submitGuestbook;}catch(e){setBookError(responseError(e));}finally{setBusy('');}}
+ async function rsvp(e:FormEvent<HTMLFormElement>){
+  e.preventDefault();const form=new FormData(e.currentTarget);setBusy('rsvp');setError('');
+  try{
+   const replyId=crypto.randomUUID();
+   const data={
+    id:replyId,
+    name:String(form.get('name')),
+    attendance,
+    partySize:attendance==='yes'?Number(form.get('party')):0,
+    meal:attendance==='yes'?String(form.get('meal')):null,
+    ceremonies:attendance==='yes'?form.getAll('ceremonies'):[],
+    note:String(form.get('note')||''),
+    createdAt:serverTimestamp()
+   };
+   await setDoc(doc(services!.db,'events',access.id,'rsvps',replyId),data);
+   setReceipt(replyId);
+  }catch(e){setError(responseError(e));}finally{setBusy('');}
+ }
+ async function book(e:FormEvent<HTMLFormElement>){
+  e.preventDefault();const form=e.currentTarget,data=new FormData(form);setBusy('book');setBookNotice('');setBookError('');
+  try{
+   const entryId=crypto.randomUUID();
+   await setDoc(doc(services!.db,'events',access.id,'guestbook',entryId),{
+    id:entryId,
+    displayName:String(data.get('displayName')),
+    message:String(data.get('message')),
+    status:'pending',
+    consent:data.get('consent')==='on',
+    createdAt:serverTimestamp()
+   });
+   setBookNotice('Message saved for host review. It will appear only if approved.');form.reset();
+  }catch(e){setBookError(responseError(e));}finally{setBusy('');}
+ }
  return <><section id="rsvp" className="inv-section inv-rsvp"><div className="inv-section-heading"><span className="inv-kicker">A PLACE AT OUR CELEBRATION</span><h2>Will you join us?</h2></div><div className="inv-form-panel"><p>Your reply and note are private to the host. No email or phone number is required.</p>{emulatorMode&&<p className="inv-demo-notice">Local test: replies are saved in the Firebase emulator. Use sample details.</p>}{!access.rsvpOpen?<p>RSVP is currently closed. Please contact your host.</p>:receipt?<div ref={result} tabIndex={-1} role="status"><h3>Your reply has been saved.</h3><p>The host can now see your response. Contact them directly if your plans change.</p><small>Reference: {receipt.slice(0,8)}</small></div>:<form className="guest-response-form" onSubmit={rsvp}><fieldset disabled={!!busy}><legend className="sr-only">Your RSVP</legend><label>Your name<input name="name" required maxLength={100} autoComplete="name"/></label><fieldset><legend>Will you attend?</legend><label className="inv-radio"><input type="radio" name="attendance" checked={attendance==='yes'} onChange={()=>setAttendance('yes')}/>Joyfully accept</label><label className="inv-radio"><input type="radio" name="attendance" checked={attendance==='no'} onChange={()=>setAttendance('no')}/>Regretfully decline</label></fieldset>{attendance==='yes'&&<><div className="inv-form-row"><label>Party size<select name="party">{[1,2,3,4,5,6].map(n=><option value={n} key={n}>{n} {n===1?'guest':'guests'}</option>)}</select></label><label>Meal preference<select name="meal">{['No preference','Vegetarian','Vegan','Halal'].map(m=><option key={m}>{m}</option>)}</select></label></div>{event.ceremonies.length>0&&<fieldset><legend>Which ceremonies will you attend?</legend>{event.ceremonies.map(c=><label className="inv-radio" key={c.id}><input type="checkbox" name="ceremonies" value={c.id} defaultChecked/>{c.title}</label>)}</fieldset>}</>}<label>Private note to the host (optional)<textarea name="note" rows={3} maxLength={500}/></label><button className="inv-button" disabled={!!busy}>{busy==='rsvp'?'Saving reply…':'Send my RSVP'}</button></fieldset>{error&&<p role="alert">{error}</p>}</form>}</div></section><section className="inv-section inv-rsvp" id="guestbook"><div className="inv-section-heading"><span className="inv-kicker">WORDS TO KEEP</span><h2>A note for the celebration.</h2><p>Messages appear after the host approves them.</p></div><div className="inv-form-panel">{entries.length===0?<p>No approved messages yet.</p>:entries.map(entry=><blockquote key={entry.id}><p>{entry.message}</p><cite>{entry.displayName}</cite></blockquote>)}{access.guestbookOpen?<form className="guest-response-form" onSubmit={book}><fieldset disabled={!!busy}><legend>Leave a guestbook message</legend><label>Display name<input name="displayName" required maxLength={80}/></label><label>Your message<textarea name="message" required maxLength={800} rows={4}/></label><label className="inv-radio"><input type="checkbox" name="consent" required/>I agree that my display name and message may be shown to invitation guests after host approval.</label><button className="inv-button" disabled={!!busy}>{busy==='book'?'Saving message…':'Send for approval'}</button></fieldset></form>:<p>The host has closed new guestbook messages.</p>}{bookNotice&&<p role="status">{bookNotice}</p>}{bookError&&<p role="alert">{bookError}</p>}</div></section></>;
 }
