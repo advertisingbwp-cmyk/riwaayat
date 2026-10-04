@@ -43,3 +43,4 @@
 .inv-sahar .sahar-reveal{opacity:1;transform:none;transition:none}
 }
 @media print{.inv-sahar .sahar-reveal{opacity:1;transform:none}}
+.inv-sahar .inv-opening h2,.inv-sahar .inv-opening .inv-back,.inv-sahar .inv-opening .inv-text-button,.inv-sahar .inv-hero .inv-date span{color:#f4e6cf}
