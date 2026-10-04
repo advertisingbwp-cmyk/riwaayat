@@ -52,10 +52,9 @@ export default function Blog({ slug }: { slug?: string }) {
             url: 'https://riwaayat-venue.vercel.app/images/royal.webp'
           }
         },
-        datePublished: '2026-09-01',
         mainEntityOfPage: pageUrl
       });
-      document.head.appendChild(scriptEl);
+      if(!document.getElementById('page-ld-json'))document.head.appendChild(scriptEl);
     } else {
       const hubUrl = 'https://riwaayat-venue.vercel.app/blog';
       document.title = 'Wedding & Celebration Guides, Etiquette & Ideas — Riwaayat';

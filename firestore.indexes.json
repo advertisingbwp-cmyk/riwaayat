@@ -1,1 +1,19 @@
-{"indexes":[],"fieldOverrides":[{"collectionGroup":"guestSessions","fieldPath":"expiresAt","ttl":true,"indexes":[]},{"collectionGroup":"limits","fieldPath":"expiresAt","ttl":true,"indexes":[]}]}
+{
+  "indexes": [
+    {
+      "collectionGroup": "guestbook",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "visibility",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

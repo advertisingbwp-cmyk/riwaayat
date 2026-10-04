@@ -2,19 +2,18 @@ import { initializeApp } from 'firebase/app';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
 import { getAuth, connectAuthEmulator, browserSessionPersistence, setPersistence } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 const env=import.meta.env;
-const config={apiKey:env.VITE_FIREBASE_API_KEY,authDomain:env.VITE_FIREBASE_AUTH_DOMAIN,projectId:env.VITE_FIREBASE_PROJECT_ID,storageBucket:env.VITE_FIREBASE_STORAGE_BUCKET,appId:env.VITE_FIREBASE_APP_ID};
+const config={apiKey:env.VITE_FIREBASE_API_KEY,authDomain:env.VITE_FIREBASE_AUTH_DOMAIN,projectId:env.VITE_FIREBASE_PROJECT_ID,appId:env.VITE_FIREBASE_APP_ID};
 export const emulatorMode=env.VITE_FIREBASE_EMULATORS==='true';
 export const configurationError=Object.values(config).some(value=>!value)?'Account services are not configured yet. You can still explore all three invitation designs.':emulatorMode&&(!config.projectId.startsWith('demo-')||!['localhost','127.0.0.1'].includes(location.hostname))?'Local testing requires a demo project on localhost.':!emulatorMode&&!env.VITE_FIREBASE_APPCHECK_SITE_KEY?'Account services need App Check configuration before they can open.':null;
 function connect(){
   if(configurationError)return null;
   const app=initializeApp(config);
   if(!emulatorMode)initializeAppCheck(app,{provider:new ReCaptchaEnterpriseProvider(env.VITE_FIREBASE_APPCHECK_SITE_KEY),isTokenAutoRefreshEnabled:true});
-  const auth=getAuth(app),db=getFirestore(app),functions=getFunctions(app,'us-central1');
-  if(emulatorMode){connectAuthEmulator(auth,'http://127.0.0.1:9098',{disableWarnings:true});connectFirestoreEmulator(db,'127.0.0.1',8086);connectFunctionsEmulator(functions,'127.0.0.1',5002);}
+  const auth=getAuth(app),db=getFirestore(app);
+  if(emulatorMode){connectAuthEmulator(auth,'http://127.0.0.1:9098',{disableWarnings:true});connectFirestoreEmulator(db,'127.0.0.1',8086);}
   const ready=setPersistence(auth,browserSessionPersistence);
-  return {auth,db,functions,ready};
+  return {auth,db,ready};
 }
 export const services=connect();
 export function friendlyError(error:unknown){

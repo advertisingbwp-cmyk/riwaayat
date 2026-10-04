@@ -1,3 +1,13 @@
+# Current Spark release status — 4 October 2026
+
+The current frontend uses Firebase Authentication and Firestore only. No Cloud Functions, Cloud Storage, scheduled workers, email API or billing upgrade is needed. `functions/` is retained as legacy reference and for existing validation tests; it is not deployed by `firebase.json`.
+
+See [RELEASE_AUDIT.md](RELEASE_AUDIT.md) for confirmed fixes and the rules deployment gate. The historical implementation notes below predate this release and are not current deployment instructions.
+
+Local verification: `npm ci`, `npm ci --prefix functions` (legacy validation tests only), `npm test`, `npm run build`, and `npm run test:security` (Java 21 required). The security suite uses only the `demo-riwaayat` Firestore emulator.
+
+---
+
 # Riwaayat — homepage and invitation previews
 
 Independent React + TypeScript + Vite application. The existing server and live deployment are unchanged.

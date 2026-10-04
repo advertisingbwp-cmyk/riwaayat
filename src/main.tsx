@@ -62,7 +62,7 @@ const route = location.pathname.match(/^\/preview\/([^/]+)\/?$/);
 let event = invitationEvents.find(item => item.id === route?.[1]);
 if (event && location.search.includes('try=true')) {
   try {
-    const custom = JSON.parse(sessionStorage.getItem('riwaayat_preview_try') || '{}');
+    const custom = JSON.parse(sessionStorage.getItem(`riwaayat_try_${event.id}`) || sessionStorage.getItem('riwaayat_preview_try') || '{}');
     if (custom?.couple) {
       event = { ...event, ...custom, venue: { ...event.venue, ...(custom.venue || {}) } };
     }
