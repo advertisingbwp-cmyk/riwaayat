@@ -7,7 +7,7 @@ const chapters = [
   { label: 'THE ANTICIPATION', title: <>Some moments<br/>deserve a<br/><em>beautiful beginning.</em></>, text: 'A little tradition. A little magic. Scroll to unfold an invitation that feels like you.' },
   { label: 'THE FIRST IMPRESSION', title: <>A golden seal.<br/><em>A little suspense.</em></>, text: 'Before the celebration, there’s this moment. A promise of something beautiful inside.' },
   { label: 'THE REVEAL', title: <>And then,<br/><em>your story unfolds.</em></>, text: 'Names that belong together. A date to remember. Your people, invited with love.' },
-  { label: 'YOUR NEXT CHAPTER', title: <>One beautiful feeling.<br/><em>So many ways<br/>to make it yours.</em></>, text: 'Royal Heritage. Noor. Bloom. Find the beginning that belongs to your celebration.' },
+  { label: 'YOUR NEXT CHAPTER', title: <>One beautiful feeling.<br/><em>So many ways<br/>to make it yours.</em></>, text: 'Royal Heritage. Noor. Bloom. Sahar. Find the beginning that belongs to your celebration.' },
 ];
 
 export function ScrollHero({ designs, onPreview }: { designs: PreviewDesign[]; onPreview: () => void }) {

@@ -5,7 +5,7 @@ import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 const env=import.meta.env;
 const config={apiKey:env.VITE_FIREBASE_API_KEY,authDomain:env.VITE_FIREBASE_AUTH_DOMAIN,projectId:env.VITE_FIREBASE_PROJECT_ID,appId:env.VITE_FIREBASE_APP_ID};
 export const emulatorMode=env.VITE_FIREBASE_EMULATORS==='true';
-export const configurationError=Object.values(config).some(value=>!value)?'Account services are not configured yet. You can still explore all three invitation designs.':emulatorMode&&(!config.projectId.startsWith('demo-')||!['localhost','127.0.0.1'].includes(location.hostname))?'Local testing requires a demo project on localhost.':!emulatorMode&&!env.VITE_FIREBASE_APPCHECK_SITE_KEY?'Account services need App Check configuration before they can open.':null;
+export const configurationError=Object.values(config).some(value=>!value)?'Account services are not configured yet. You can still explore all invitation designs.':emulatorMode&&(!config.projectId.startsWith('demo-')||!['localhost','127.0.0.1'].includes(location.hostname))?'Local testing requires a demo project on localhost.':!emulatorMode&&!env.VITE_FIREBASE_APPCHECK_SITE_KEY?'Account services need App Check configuration before they can open.':null;
 function connect(){
   if(configurationError)return null;
   const app=initializeApp(config);

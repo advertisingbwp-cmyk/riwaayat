@@ -1,4 +1,4 @@
-import type { InvitationEvent } from './events';
+import { invitationEvents, type InvitationEvent } from './events';
 export type Content={
  couple:string;intro:string;note:string;quote:string;startsAt:string;timeZone:string;hashtag:string;dressCode:string;
  venue:InvitationEvent['venue'];story:InvitationEvent['story'];ceremonies:InvitationEvent['ceremonies'];
@@ -10,14 +10,14 @@ export type Content={
  effects:{opening:boolean;particles:boolean;music:boolean;scratch:boolean};
 };
 export type SavedDraft={id:string;title:string;templateId:InvitationEvent['id'];content:Content|null;revision?:number;status:string;publishedRevision?:number;publishedAccess?:string;archived?:boolean};
-export const blankContent=(template:InvitationEvent['id']):Content=>({couple:'',intro:'You are warmly invited',note:'',quote:'',startsAt:new Date(Date.now()+30*86400000).toISOString(),timeZone:'Asia/Karachi',hashtag:'',dressCode:'',venue:{name:'',address:'',mapQuery:''},story:[],ceremonies:[],imagePhotoId:null,venuePhotoId:null,imagePosition:'50% 50%',venueImagePosition:'50% 50%',galleryPhotoIds:[],instrument:template==='noor'?'Oud':template==='royal'?'Sitar':'Piano',particle:template==='noor'?'stars':template==='royal'?'petals':'leaves',effects:{opening:true,particles:true,music:true,scratch:true}});
+export const blankContent=(template:InvitationEvent['id']):Content=>({couple:'',intro:'You are warmly invited',note:'',quote:'',startsAt:new Date(Date.now()+30*86400000).toISOString(),timeZone:'Asia/Karachi',hashtag:'',dressCode:'',venue:{name:'',address:'',mapQuery:''},story:[],ceremonies:[],imagePhotoId:null,venuePhotoId:null,imagePosition:'50% 50%',venueImagePosition:'50% 50%',galleryPhotoIds:[],instrument:invitationEvents.find(e=>e.id===template)!.instrument,particle:invitationEvents.find(e=>e.id===template)!.particle,effects:{opening:true,particles:true,music:true,scratch:true}});
 export function toInvitation(template:InvitationEvent['id'],content:Content,images:Record<string,string>):InvitationEvent {
  const fallback='/images/invitation-placeholder.svg';
- const defaultVenueImg = template === 'noor' ? '/images/noor-3.webp' : template === 'royal' ? '/images/royal-3.webp' : '/images/bloom-3.webp';
+ const defaultVenueImg = invitationEvents.find(e=>e.id===template)?.venueImage || invitationEvents.find(e=>e.id===template)?.gallery[2]?.src || fallback;
  return {
   ...content,
   id:template,
-  name:template==='royal'?'Royal Heritage':template==='noor'?'Noor':'Bloom',
+  name:invitationEvents.find(e=>e.id===template)?.name || 'Invitation',
   category:'Invitation',
   mood:'',
   image:content.imagePhotoId?images[content.imagePhotoId]||fallback:fallback,
