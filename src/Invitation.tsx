@@ -3,6 +3,7 @@ import { countdownParts, formatEventDate, type InvitationEvent } from './events'
 import { MusicControls, Particles, ScratchCard, useReducedMotion } from './invitation-effects';
 import './invitation.css';
 import './sahar.css';
+import './mehr.css';
 import {useSaharScroll} from './useSaharScroll';
 
 function Countdown({event}:{event:InvitationEvent}) {
@@ -31,7 +32,7 @@ function Gallery({event,sample}:{event:InvitationEvent;sample:boolean}) {
 export function Invitation({event,sample=true,ownerPreview=false,responseSection}:{event:InvitationEvent;sample?:boolean;ownerPreview?:boolean;responseSection?:ReactNode}) {
   const reduced=useReducedMotion();
   const page=useRef<HTMLDivElement>(null);
-  useSaharScroll(page,event.id==='sahar',reduced);
+  useSaharScroll(page,event.id==='sahar'||event.id==='mehr',reduced);
   const [opened,setOpened]=useState(event.effects?.opening===false);
   const [opening,setOpening]=useState(false);
   const [effects,setEffects]=useState(true);
@@ -50,13 +51,25 @@ export function Invitation({event,sample=true,ownerPreview=false,responseSection
         <button
           className="inv-preview-cta"
           onClick={() => location.assign(`/edit/try-${event.id}`)}
+          style={{
+            marginLeft: 'auto',
+            background: '#d4af37',
+            color: '#1a1815',
+            border: 'none',
+            padding: '6px 14px',
+            borderRadius: '999px',
+            fontWeight: 600,
+            fontSize: '0.82rem',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)'
+          }}
         >
           Customise this design ↗
         </button>
       )}
     </div>
-    <header className="inv-nav"><a className="inv-monogram" href="#inv-main">{sample?(event.id==='royal'?'A & M':event.id==='noor'?'Z & A':event.id==='sahar'?'D & I':'A · 21'):event.couple.split(/\s+/).filter(w=>/^[\p{L}]/u.test(w)).slice(0,2).map(w=>w[0]).join(' · ')}</a><nav aria-label="Invitation navigation">{event.ceremonies.length>0&&<a href="#celebration">The celebration</a>}{event.gallery.length>0&&<a href="#moments">Photographs</a>}<a href="#rsvp">RSVP</a></nav></header>
-    <main id="inv-main"><section className="inv-hero"><div className="inv-hero-photo"><img src={event.image} alt={sample?`${event.name} celebration inspiration`:"Celebration cover photograph"} width="900" height="1100" fetchPriority="high" style={{ objectPosition: event.imagePosition || 'center center' }}/></div><div className="inv-hero-copy"><span className="inv-kicker">{event.id==='bloom'?'A NEW YEAR OF WONDER':'YOU ARE WARMLY INVITED'}</span><span className="inv-ornament" aria-hidden="true">{ornament}</span><p className="inv-intro">{event.intro}</p><h1 ref={heading} tabIndex={-1}>{event.couple}</h1><p className="inv-note">{event.note}</p><div className="inv-date">{formatEventDate(event.startsAt,event.timeZone)}<span>{event.venue.name}</span></div><a className="inv-button" href="#rsvp">{event.id==='bloom'?'Count me in':'Celebrate with us'} <span aria-hidden="true">↓</span></a></div><div className="inv-hero-bottom" aria-hidden="true">{event.id==='bloom'?'GOOD PEOPLE. GREAT MEMORIES.':'A CELEBRATION OF LOVE & TOGETHERNESS.'}</div></section>
+    <header className="inv-nav"><a className="inv-monogram" href="#inv-main">{sample?(event.id==='royal'?'A & M':event.id==='noor'?'Z & A':event.id==='sahar'?'D & I':event.id==='mehr'?'H & E':'A · 21'):event.couple.split(/\s+/).filter(w=>/^[\p{L}]/u.test(w)).slice(0,2).map(w=>w[0]).join(' · ')}</a><nav aria-label="Invitation navigation">{event.ceremonies.length>0&&<a href="#celebration">The celebration</a>}{event.gallery.length>0&&<a href="#moments">Photographs</a>}<a href="#rsvp">RSVP</a></nav></header>
+    <main id="inv-main"><section className="inv-hero">{event.id==='mehr'&&<span className="mehr-margin-note" aria-hidden="true">a day to keep forever</span>}<div className="inv-hero-photo"><img src={event.image} alt={sample?`${event.name} celebration inspiration`:"Celebration cover photograph"} width="900" height="1100" fetchPriority="high" style={{ objectPosition: event.imagePosition || 'center center' }}/></div><div className="inv-hero-copy"><span className="inv-kicker">{event.id==='bloom'?'A NEW YEAR OF WONDER':'YOU ARE WARMLY INVITED'}</span><span className="inv-ornament" aria-hidden="true">{ornament}</span><p className="inv-intro">{event.intro}</p><h1 ref={heading} tabIndex={-1}>{event.couple}</h1><p className="inv-note">{event.note}</p><div className="inv-date">{formatEventDate(event.startsAt,event.timeZone)}<span>{event.venue.name}</span></div><a className="inv-button" href="#rsvp">{event.id==='bloom'?'Count me in':'Celebrate with us'} <span aria-hidden="true">↓</span></a></div><div className="inv-hero-bottom" aria-hidden="true">{event.id==='bloom'?'GOOD PEOPLE. GREAT MEMORIES.':'A CELEBRATION OF LOVE & TOGETHERNESS.'}</div></section>
     <Countdown event={event}/>
     {(event.story.length>0||event.quote)&&<section className="inv-section inv-story"><div className="inv-section-heading"><span className="inv-kicker">{event.id==='bloom'?'HERE’S TO MORE':'OUR LITTLE STORY'}</span><h2>{event.id==='bloom'?'A new chapter begins.':'The way we found forever.'}</h2>{event.quote&&<p className="inv-quote">“{event.quote}”</p>}</div><div className="inv-story-grid">{event.story.map((moment,index)=><article key={moment.year}><span className="inv-story-index">0{index+1}</span><small>{moment.year}</small><h3>{moment.title}</h3><p>{moment.text}</p></article>)}</div></section>}
     {event.ceremonies.length>0&&<section className="inv-section inv-celebration" id="celebration"><div className="inv-section-heading"><span className="inv-kicker">COME FOR THE MOMENTS. STAY FOR THE MEMORIES.</span><h2>{event.id==='bloom'?'A lovely little plan.':'The celebration unfolds.'}</h2><p>All times are local to the venue · {event.timeZone}</p></div><div className="inv-itinerary">{event.ceremonies.map((ceremony,index)=><article key={ceremony.id}><span className="inv-ceremony-number">0{index+1}</span><div><time dateTime={ceremony.startsAt}>{formatEventDate(ceremony.startsAt,event.timeZone,true)}</time><h3>{ceremony.title}</h3><p>{ceremony.place}</p></div><span className="inv-attire">{ceremony.attire}</span></article>)}</div></section>}
@@ -83,7 +96,7 @@ export function Invitation({event,sample=true,ownerPreview=false,responseSection
       <a href="/#designs">Made with Riwaayat · Explore the collection ↗</a>
     </footer></main>
     {opened&&(event.effects?.music!==false||event.effects?.particles!==false)&&<aside className="inv-controls" aria-label="Invitation effects">{event.effects?.music!==false&&<MusicControls initial={event.instrument}/>}{event.effects?.particles!==false&&<button className="inv-small-button" onClick={()=>setEffects(!effects)} aria-pressed={!effects} disabled={reduced}>{reduced?'Reduced motion':effects?'Pause particles':'Resume particles'}</button>}</aside>}
-    <dialog className={`inv-opening ${opening?'opening':''}`} ref={gate} aria-labelledby="opening-title" onCancel={e=>{e.preventDefault();setOpened(true);}}><div className="inv-opening-content"><a href="/#designs" className="inv-back">← Back to the collection</a><span className="inv-kicker">A LITTLE SOMETHING, JUST FOR YOU</span><h2 id="opening-title">{event.couple}</h2><p>{event.id==='bloom'?'An invitation to celebrate.':'A beginning to remember.'}</p><div className="invite-envelope"><div className="invite-envelope-letter"><span>{ornament}</span><h3>{event.couple}</h3><small>{formatEventDate(event.startsAt,event.timeZone)}</small></div><div className="invite-envelope-back"/><div className="invite-envelope-pocket"/><div className="invite-envelope-flap"/><button className="invite-wax" aria-label="Open invitation" disabled={opening} onClick={()=>setOpening(true)}><span>{sample?(event.id==='royal'?'A M':event.id==='noor'?'Z A':event.id==='sahar'?'D I':'A'):'✧'}</span></button></div><p className="inv-opening-hint" aria-live="polite">{opening?'Your invitation is unfolding…':'Touch the seal to unfold the story.'}</p><div style={{display:'flex',gap:'10px',justifyContent:'center',flexWrap:'wrap',marginTop:'8px'}}><button className="inv-text-button" onClick={()=>setOpened(true)}>Open invitation →</button>{sample&&<button className="button primary" style={{padding:'6px 14px',fontSize:'0.82rem'}} onClick={()=>location.assign(`/edit/try-${event.id}`)}>Personalise in Studio ↗</button>}</div><small className="inv-opening-demo">{sample?'DESIGN PREVIEW · SAMPLE EVENT':ownerPreview?'PRIVATE INVITATION PREVIEW':'AN INVITATION FOR YOU'}</small></div></dialog>
+    <dialog className={`inv-opening ${opening?'opening':''}`} ref={gate} aria-labelledby="opening-title" onCancel={e=>{e.preventDefault();setOpened(true);}}><div className="inv-opening-content"><a href="/#designs" className="inv-back">← Back to the collection</a><span className="inv-kicker">A LITTLE SOMETHING, JUST FOR YOU</span><h2 id="opening-title">{event.couple}</h2><p>{event.id==='bloom'?'An invitation to celebrate.':'A beginning to remember.'}</p><div className="invite-envelope"><div className="invite-envelope-letter"><span>{ornament}</span><h3>{event.couple}</h3><small>{formatEventDate(event.startsAt,event.timeZone)}</small></div><div className="invite-envelope-back"/><div className="invite-envelope-pocket"/><div className="invite-envelope-flap"/><button className="invite-wax" aria-label="Open invitation" disabled={opening} onClick={()=>setOpening(true)}><span>{sample?(event.id==='royal'?'A M':event.id==='noor'?'Z A':event.id==='sahar'?'D I':event.id==='mehr'?'H E':'A'):'✧'}</span></button></div><p className="inv-opening-hint" aria-live="polite">{opening?'Your invitation is unfolding…':'Touch the seal to unfold the story.'}</p><div style={{display:'flex',gap:'10px',justifyContent:'center',flexWrap:'wrap',marginTop:'8px'}}><button className="inv-text-button" onClick={()=>setOpened(true)}>Open invitation →</button>{sample&&<button className="button primary" style={{padding:'6px 14px',fontSize:'0.82rem'}} onClick={()=>location.assign(`/edit/try-${event.id}`)}>Personalise in Studio ↗</button>}</div><small className="inv-opening-demo">{sample?'DESIGN PREVIEW · SAMPLE EVENT':ownerPreview?'PRIVATE INVITATION PREVIEW':'AN INVITATION FOR YOU'}</small></div></dialog>
   </div>;
 }
 

@@ -1,7 +1,7 @@
 export type Instrument = 'Sitar' | 'Guitar' | 'Oud' | 'Piano';
 export type InvitationEvent = {
   effects?: {opening:boolean;particles:boolean;music:boolean;scratch:boolean};
-  id: 'royal' | 'noor' | 'bloom' | 'sahar'; name: string; category: string; mood: string;
+  id: 'royal' | 'noor' | 'bloom' | 'sahar' | 'mehr'; name: string; category: string; mood: string;
   couple: string; note: string; image: string; startsAt: string; timeZone: string;
   intro: string; quote: string; hashtag: string; dressCode: string; instrument: Instrument;
   particle: 'petals' | 'stars' | 'leaves'; venue: {name: string; address: string; mapQuery: string};
@@ -58,6 +58,18 @@ export const invitationEvents: InvitationEvent[] = [
     story:[{year:'2022',title:'The first hello',text:'One conversation became another. Somewhere between the laughter and the long walks, we found a familiar kind of peace.'},{year:'2025',title:'Choosing each other',text:'Through changing seasons and everyday adventures, our favourite place became wherever we were together.'},{year:'2027',title:'A new dawn',text:'Now we begin a new chapter, surrounded by the people who have been part of our story all along.'}],
     ceremonies:[{id:'welcome',title:'Golden hour welcome',startsAt:'2027-02-14T17:30:00+05:00',place:'The terrace',attire:'Midnight blue & ivory'},{id:'nikah',title:'Our Nikah',startsAt:'2027-02-14T18:00:00+05:00',place:'The garden pavilion',attire:'Elegant occasion wear'},{id:'dinner',title:'Dinner beneath the stars',startsAt:'2027-02-14T19:30:00+05:00',place:'The Sahar Terrace',attire:'Stay for the evening'}],
     gallery:[{src:'/images/sahar-1.webp',alt:'AI-generated ivory bridal bouquet on midnight-blue silk'},{src:'/images/sahar-2.webp',alt:'AI-generated newlywed hands with ivory and navy embroidered sleeves'},{src:'/images/sahar-3.webp',alt:'AI-generated candlelit reception table'},{src:'/images/sahar-4.webp',alt:'AI-generated jasmine wedding arch at twilight'}],
+  },
+  {
+    id:'mehr',name:'Mehr',category:'Nikah & Walima',mood:'A little sunshine. A lifetime of together.',
+    couple:'Hamza & Eman',note:'With full hearts and our favourite people, we invite you to celebrate the start of our forever.',
+    image:'/images/mehr-cover.webp',startsAt:'2027-03-21T16:00:00+05:00',timeZone:'Asia/Karachi',
+    intro:'Of all the little things, you are my favourite.',quote:'Our story is made of ordinary days, made extraordinary together.',
+    hashtag:'#HamzaAndEman',dressCode:'Warm peach, soft ivory & a little marigold',instrument:'Guitar',particle:'petals',
+    venue:{name:'The Mehr Courtyard',address:'Bahawalpur, Punjab, Pakistan · fictional sample venue',mapQuery:'Bahawalpur Pakistan'},
+    venueImage:'/images/mehr-venue.webp',
+    story:[{year:'2023',title:'A hello worth keeping',text:'At a family gathering, a shared joke turned into a conversation neither of us wanted to end.'},{year:'2025',title:'Our favourite everyday',text:'Long walks, little notes and cups of chai. Somehow the smallest moments became the ones that mattered most.'},{year:'2027',title:'Here comes our forever',text:'Now we are gathering our favourite people for a day full of warmth, gratitude and a little happy chaos.'}],
+    ceremonies:[{id:'welcome',title:'Chai & happy hellos',startsAt:'2027-03-21T16:00:00+05:00',place:'The garden entrance',attire:'Peach, ivory & warm smiles'},{id:'nikah',title:'The forever part',startsAt:'2027-03-21T17:00:00+05:00',place:'The courtyard',attire:'Modest festive wear'},{id:'dinner',title:'A table for everyone',startsAt:'2027-03-21T18:30:00+05:00',place:'Under the fairy lights',attire:'Stay comfortable, stay a little longer'}],
+    gallery:[{src:'/images/mehr-1.webp',alt:'AI-generated marigolds in terracotta vases'},{src:'/images/mehr-2.webp',alt:'AI-generated wedding envelope exchanged by a couple'},{src:'/images/mehr-3.webp',alt:'AI-generated golden-hour courtyard wedding table'}],
   },
 ];
 

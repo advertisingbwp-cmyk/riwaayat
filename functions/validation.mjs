@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import sharp from 'sharp';
-export const draftInput = z.object({requestId:z.string().uuid(),title:z.string().trim().min(1).max(100),templateId:z.enum(['royal','noor','bloom','sahar'])}).strict();
+export const draftInput = z.object({requestId:z.string().uuid(),title:z.string().trim().min(1).max(100),templateId:z.enum(['royal','noor','bloom','sahar','mehr'])}).strict();
 export const photoInput = z.object({eventId:z.string().uuid(),requestId:z.string().uuid(),base64:z.string().min(1).max(5600000)}).strict();
 export async function normalizePhoto(base64) {
   if (!/^[A-Za-z0-9+/]+={0,2}$/.test(base64) || base64.length%4) throw new Error('Invalid image encoding.');

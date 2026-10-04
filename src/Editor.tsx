@@ -5,7 +5,7 @@ import {compressImage} from './image-compress';
 import {publishInvitation,unpublishInvitation,duplicateInvitation} from './invitation-store';
 import {configurationError,emulatorMode,services} from './firebase';
 import {blankContent,editorError,type Content,type SavedDraft} from './editor-model';
-import { invitationEvents } from './events';
+import { invitationEvents, type InvitationEvent } from './events';
 import './account.css';
 import './editor.css';
 function localTime(iso:string,zone:string){try{const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso)).map(v=>[v.type,v.value]));return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;}catch{return '';}}
@@ -14,7 +14,7 @@ function getPos(pos?:string){const p=(pos||'50% 50%').split(' ');return {x:Numbe
 
 export default function Editor({id}:{id:string}){
  const isTryMode = id.startsWith('try-');
- const tryTemplateId = (isTryMode ? id.replace(/^try-/, '') : 'royal') as 'royal' | 'noor' | 'bloom' | 'sahar';
+ const tryTemplateId = (isTryMode ? id.replace(/^try-/, '') : 'royal') as InvitationEvent['id'];
  const [draft,setDraft]=useState<SavedDraft|null>(null),[content,setContent]=useState<Content|null>(null),[title,setTitle]=useState(''),[photos,setPhotos]=useState<{id:string;path?:string}[]>([]),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[loaded,setLoaded]=useState(false),[access,setAccess]=useState('public'),[passcode,setPasscode]=useState(''),[archive,setArchive]=useState(false);
  const blank=useRef<Content|null>(null);const dirty=!!draft&&JSON.stringify([title,content])!==JSON.stringify([draft.title,draft.content||blank.current]);
  useEffect(()=>{

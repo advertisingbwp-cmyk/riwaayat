@@ -1,0 +1,59 @@
+/* Mehr — sunlit paper, postcard schedules and a scrapbook story. */
+.inv-mehr{--inv-bg:#fbf4e6;--inv-ink:#713f2c;--inv-accent:#936044;--inv-panel:#f0dfc6;--inv-line:#a7774c40;--inv-text:#715f4e;background-image:radial-gradient(#99714f13 .7px,transparent .7px);background-size:6px 6px;overflow-x:clip}
+.inv-mehr .inv-nav{border-bottom:1px dashed var(--inv-line)}
+.inv-mehr .inv-hero{grid-template-columns:1.1fr 1fr;gap:9%;padding:90px 9% 110px;min-height:780px}
+.inv-mehr .inv-hero-copy{grid-column:1;grid-row:1;text-align:left}
+.inv-mehr .inv-hero h1{font-size:clamp(72px,7.5vw,112px);font-style:italic;line-height:.95;max-width:550px}
+.inv-mehr .inv-hero .inv-note{margin:0;max-width:370px}
+.inv-mehr .inv-hero .inv-ornament{margin:20px 0;font-size:35px}
+.inv-mehr .inv-hero-photo{grid-column:2;grid-row:1;height:510px;outline:0;padding:14px 14px 55px;background:#fffdf7;box-shadow:8px 18px 40px #71482b25;transform:rotate(5deg)}
+.inv-mehr .inv-hero-photo:before{content:'';position:absolute;width:130px;height:35px;left:calc(50% - 65px);top:-16px;background:#d9bd85a8;transform:rotate(-8deg);z-index:2}
+.inv-mehr .inv-hero-photo:after{inset:auto 14px 14px;background:none;content:'the beginning of everything';text-align:center;font:italic 22px 'Cormorant Garamond',Georgia,serif;color:var(--inv-ink)}
+.inv-mehr .mehr-margin-note{position:absolute;left:9%;bottom:40px;font:italic 25px 'Cormorant Garamond',Georgia,serif;transform:rotate(-4deg)}
+.inv-mehr .inv-hero-bottom{left:auto;right:8%;bottom:40px;max-width:200px;line-height:1.8;text-align:right}
+.inv-mehr .inv-button{border-radius:100px;background:#7f432f;color:#fff7e8;border-color:#7f432f}
+.inv-mehr .inv-countdown-section{margin:0 5%;background:#e6ead9;border:1px dashed #65705266;border-radius:170px 170px 15px 15px;padding:50px 20px 35px}
+.inv-mehr .inv-countdown-section .inv-kicker{color:#536143}
+.inv-mehr .inv-story-grid{display:flex;flex-direction:column;gap:35px;max-width:820px;margin:auto;position:relative}
+.inv-mehr .inv-story-grid:before{content:'';position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed #a7774c80}
+.inv-mehr .inv-story-grid article{position:relative;width:65%;padding:35px;background:#fffaf0;border:1px solid var(--inv-line);box-shadow:4px 8px 0 #e9dbc380;border-radius:3px}
+.inv-mehr .inv-story-grid article:nth-child(even){align-self:flex-end;background:#f0e4d2}
+.inv-mehr .inv-story-index{font-size:55px;margin-top:0}
+.inv-mehr .inv-itinerary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:none;gap:24px}
+.inv-mehr .inv-itinerary article{display:flex;flex-direction:column;align-items:flex-start;gap:22px;background:#fffaf0;padding:32px 25px;border:1px dashed #a7774c88;box-shadow:6px 6px 0 #ead5b8;position:relative}
+.inv-mehr .inv-itinerary article:after{content:'✳';position:absolute;right:20px;top:25px;color:#a75a38;font-size:30px}
+.inv-mehr .inv-itinerary h3{font-size:30px}
+.inv-mehr .inv-attire{text-align:left}
+.inv-mehr .inv-gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:30px;padding:20px 10px}
+.inv-mehr .inv-gallery button{background:#fffdf7;padding:12px 12px 45px;box-shadow:6px 10px 22px #71482b20;overflow:visible;rotate:-3deg;aspect-ratio:.76}
+.inv-mehr .inv-gallery button:nth-child(even){rotate:4deg;margin-top:35px}
+.inv-mehr .inv-gallery button>span{bottom:8px;right:12px}
+.inv-mehr .inv-venue-image{padding:12px;background:#fffdf7;box-shadow:6px 10px 22px #71482b20;rotate:-2deg}
+.inv-mehr .inv-form-panel{background:#fffaf0;border:1px dashed #a7774c88;box-shadow:8px 8px 0 #ead5b8;border-radius:6px}
+.inv-mehr .inv-footer{background:#e6ead9;border-top:1px dashed #65705266}
+.inv-mehr .inv-opening{background:#fbf4e6;background-image:radial-gradient(#99714f18 1px,transparent 1px);background-size:8px 8px}
+.inv-mehr .sahar-reveal{opacity:0;transform:translateY(36px) rotate(-1deg);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.7,.3,1)}
+.inv-mehr .sahar-visible,.inv-mehr .sahar-reveal:focus-within{opacity:1;transform:none}
+.mehr .sample-card{background:#fbf4e6;transform:rotate(5deg);outline:1px dashed #a7774c99;box-shadow:10px 10px 0 #713f2c30}
+.mehr .sample-card>span:not(.sample-ornament){color:#713f2c;font-style:italic}
+@media(max-width:900px){.inv-mehr .inv-hero{padding:65px 7% 100px;gap:6%;min-height:680px}.inv-mehr .inv-hero-photo{height:430px}.inv-mehr .inv-itinerary{gap:15px}.inv-mehr .inv-itinerary article{padding:28px 18px}}
+@media(max-width:650px){
+.inv-mehr .inv-hero{display:flex;flex-direction:column;padding:40px 7% 90px;gap:35px;min-height:0}
+.inv-mehr .inv-hero-copy{text-align:center;width:100%}
+.inv-mehr .inv-hero h1{font-size:clamp(60px,16vw,84px);max-width:100%;overflow-wrap:anywhere}
+.inv-mehr .inv-hero .inv-note{margin:auto}
+.inv-mehr .inv-hero .inv-ornament{margin:18px auto}
+.inv-mehr .inv-hero-photo{width:86%;height:400px;transform:rotate(3deg)}
+.inv-mehr .mehr-margin-note{left:8%;bottom:29px;font-size:19px}
+.inv-mehr .inv-hero-bottom{right:7%;bottom:25px;max-width:120px;font-size:6px}
+.inv-mehr .inv-countdown-section{margin:0 20px;border-radius:100px 100px 12px 12px}
+.inv-mehr .inv-story-grid article{width:92%;padding:25px}
+.inv-mehr .inv-itinerary{grid-template-columns:1fr;gap:24px}
+.inv-mehr .inv-itinerary article{padding:28px}
+.inv-mehr .inv-gallery{grid-template-columns:1fr;gap:32px;padding:12px 25px}
+.inv-mehr .inv-gallery button{max-width:370px;width:100%;justify-self:center;aspect-ratio:.85}
+.inv-mehr .inv-gallery button:nth-child(even){margin-top:0}
+.inv-mehr .inv-venue-image{rotate:0}
+}
+@media(prefers-reduced-motion:reduce){.inv-mehr .sahar-reveal{opacity:1;transform:none;transition:none}}
+@media print{.inv-mehr .sahar-reveal{opacity:1;transform:none}}
