@@ -1,3 +1,19 @@
+# Current release: Firebase Spark only
+
+Use [RELEASE_AUDIT.md](RELEASE_AUDIT.md) for the current release procedure. Deploy the reviewed Firestore rules to the confirmed Firebase project before merging the frontend release. Do not deploy the legacy Functions/Storage instructions below: they describe the superseded backend.
+
+```
+npx firebase deploy --only firestore:rules --project <confirmed-project-id>
+```
+
+The optional guestbook composite index is in `firestore.indexes.json`. Review and deploy it separately with `--only firestore:indexes` if needed. App Check must be registered for the production origin and enforced for Firestore in Firebase Console; code cannot enable that console setting.
+
+Contact opens the visitor's email app. Deletion runs in the signed-in browser and must remain open until completion. A failed deletion can be retried. Passcode invitation guestbook notes stay host-only. Existing invitations need to be republished to gain per-photo encryption and the new guest-submission capability.
+
+---
+
+## Historical backend notes (not for this release)
+
 # New-project staging setup
 
 Status: configuration prepared locally; no cloud project, secret, billing setting or deployment has been changed. The existing website and root deployment config remain unchanged.

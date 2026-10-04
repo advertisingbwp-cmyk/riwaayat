@@ -20,6 +20,7 @@ export async function compressImage(
   maxDimension = 1200,
   maxBytes = HARD_CEILING_BYTES
 ): Promise<string> {
+  if(file.size>4*1024*1024)throw new Error('Choose a photograph smaller than 4 MB.');
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error('Failed to read image file.'));
@@ -30,8 +31,8 @@ export async function compressImage(
         let width = img.width;
         let height = img.height;
 
-        if (width <= 0 || height <= 0) {
-          reject(new Error('Invalid image dimensions.'));
+        if (width <= 0 || height <= 0 || width * height > 20000000) {
+          reject(new Error('Choose a photograph under 20 megapixels.'));
           return;
         }
 
@@ -58,8 +59,8 @@ export async function compressImage(
 
         // Multi-pass iterative loop
         for (let iteration = 0; iteration < 6; iteration++) {
-          canvas.width = Math.max(100, Math.round(width));
-          canvas.height = Math.max(100, Math.round(height));
+          canvas.width = Math.max(1, Math.round(width));
+          canvas.height = Math.max(1, Math.round(height));
 
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);

@@ -1,75 +1,67 @@
 rules_version = '2';
 service cloud.firestore {
-  match /databases/{database}/documents {
-    
-    // Helper validation functions for RSVP and Guestbook
-    function isValidRsvp() {
-      let data = request.resource.data;
-      return data.keys().hasOnly(['id', 'name', 'attendance', 'partySize', 'meal', 'ceremonies', 'note', 'createdAt'])
-        && data.id is string && data.id.size() <= 64
-        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
-        && data.attendance in ['yes', 'no']
-        && data.partySize is int && data.partySize >= 0 && data.partySize <= 6
-        && (data.meal == null || (data.meal is string && data.meal.size() <= 50))
-        && data.ceremonies is list && data.ceremonies.size() <= 20
-        && data.note is string && data.note.size() <= 500
-        && (data.createdAt == request.time || data.createdAt is timestamp);
-    }
-
-    function isValidGuestbook() {
-      let data = request.resource.data;
-      return data.keys().hasOnly(['id', 'displayName', 'message', 'status', 'consent', 'createdAt'])
-        && data.id is string && data.id.size() <= 64
-        && data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 80
-        && data.message is string && data.message.size() > 0 && data.message.size() <= 800
-        && data.status == 'pending'
-        && data.consent == true
-        && (data.createdAt == request.time || data.createdAt is timestamp);
-    }
-
-    // 1. Private Workspace: Only the account owner can read/write their own drafts and photos
-    match /owners/{uid}/events/{eventId} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-      
-      match /photos/{photoId} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
-      }
-      match /rsvps/{replyId} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
-      }
-      match /guestbook/{entryId} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
-      }
-    }
-    
-    // 2. Public Published Invitation: Anyone can read, but only the event owner can modify or delete
-    match /events/{eventId} {
-      allow read: if true;
-      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
-      allow update: if request.auth != null && resource.data.ownerId == request.auth.uid && request.resource.data.ownerId == resource.data.ownerId;
-      allow delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
-      
-      match /photos/{photoId} {
-        allow read: if true;
-        allow write: if request.auth != null && get(/databases/$(database)/documents/events/$(eventId)).data.ownerId == request.auth.uid;
-      }
-
-      // Guests can submit an RSVP with strict schema validation; only the host can read/moderate
-      match /rsvps/{replyId} {
-        allow create: if isValidRsvp();
-        allow read, update, delete: if request.auth != null && get(/databases/$(database)/documents/events/$(eventId)).data.ownerId == request.auth.uid;
-      }
-      
-      // Guests can leave a guestbook message with strict schema validation; approved visible publicly
-      match /guestbook/{entryId} {
-        allow create: if isValidGuestbook();
-        allow read: if resource.data.status == 'approved' || (request.auth != null && get(/databases/$(database)/documents/events/$(eventId)).data.ownerId == request.auth.uid);
-        allow update, delete: if request.auth != null && get(/databases/$(database)/documents/events/$(eventId)).data.ownerId == request.auth.uid;
-      }
-    }
-    
-    match /{document=**} {
-      allow read, write: if false;
-    }
+ match /databases/{database}/documents {
+  function verified(uid) { return request.auth != null && request.auth.uid == uid && request.auth.token.email_verified == true; }
+  function event(id) { return get(/databases/$(database)/documents/events/$(id)).data; }
+  function host(id) { return request.auth != null && verified(request.auth.uid) && (exists(/databases/$(database)/documents/events/$(id)) ? event(id).ownerId==request.auth.uid : exists(/databases/$(database)/documents/owners/$(request.auth.uid)/events/$(id))); }
+  function published(id) { return event(id).status == 'published'; }
+  function guestAllowed(id) {
+   let e = event(id);
+   return e.status == 'published' && (e.access == 'public' ||
+    (request.resource.data.get('guestToken', '') != '' && request.resource.data.guestToken == get(/databases/$(database)/documents/owners/$(e.ownerId)/events/$(id)).data.guestToken));
   }
+  function validRsvp(replyId) {
+   let d=request.resource.data;
+   return d.keys().hasOnly(['id','name','attendance','partySize','meal','ceremonies','note','createdAt','guestToken'])
+    && d.id == replyId && d.name is string && d.name.size()>0 && d.name.size()<=100
+    && d.attendance in ['yes','no'] && d.partySize is int
+    && ((d.attendance=='yes' && d.partySize>=1 && d.partySize<=6) || (d.attendance=='no' && d.partySize==0))
+    && (d.meal==null || (d.meal is string && d.meal.size()<=50))
+    && d.ceremonies is list && d.ceremonies.size()<=12 && d.note is string && d.note.size()<=500
+    && d.createdAt==request.time;
+  }
+  function validNote(entryId) {
+   let d=request.resource.data;
+   return d.keys().hasOnly(['id','displayName','message','status','consent','createdAt','guestToken','visibility'])
+    && d.id==entryId && d.displayName is string && d.displayName.size()>0 && d.displayName.size()<=80
+    && d.message is string && d.message.size()>0 && d.message.size()<=800
+    && d.visibility in ['public','private'] && d.status=='pending' && d.consent==true && d.createdAt==request.time;
+  }
+  match /owners/{uid}/events/{eventId} {
+   allow read, delete: if verified(uid);
+   allow create: if verified(uid) && request.resource.data.ownerId==uid;
+   allow update: if verified(uid) && request.resource.data.ownerId==uid && !resource.data.get('deleting',false);
+   match /{sub}/{entryId} {
+    allow read, delete: if verified(uid) && sub in ['photos','rsvps','guestbook'];
+    allow create, update: if verified(uid) && sub in ['photos','rsvps','guestbook'] && !getAfter(/databases/$(database)/documents/owners/$(uid)/events/$(eventId)).data.get('deleting',false);
+   }
+  }
+  match /events/{eventId} {
+   allow get: if host(eventId) || resource.data.status=='published';
+   allow list: if verified(resource.data.ownerId);
+   allow create: if verified(request.resource.data.ownerId) && validPublishedData();
+   allow update: if verified(resource.data.ownerId) && request.resource.data.ownerId==resource.data.ownerId && validPublishedData();
+   allow delete: if verified(resource.data.ownerId);
+   function validPublishedData() {
+    let d=request.resource.data;
+    return d.status in ['published','draft','archived'] && d.access in ['public','passcode']
+     && !d.keys().hasAny(['passcode','guestToken'])
+     && (d.access=='public' || (d.encryptedPayload is map && !d.keys().hasAny(['content'])));
+   }
+   match /photos/{photoId} {
+    allow read: if host(eventId) || (published(eventId) && (event(eventId).access=='public' || (resource.data.encryptedPayload is map && !resource.data.keys().hasAny(['path']))));
+    allow write: if verified(getAfter(/databases/$(database)/documents/events/$(eventId)).data.ownerId);
+   }
+   match /rsvps/{replyId} {
+    allow create: if guestAllowed(eventId) && event(eventId).guestSettings.rsvpOpen==true && validRsvp(replyId);
+    allow read, update, delete: if host(eventId);
+   }
+   match /guestbook/{entryId} {
+    allow create: if guestAllowed(eventId) && event(eventId).guestSettings.guestbookOpen==true && validNote(entryId) && request.resource.data.visibility==(event(eventId).access=='public'?'public':'private');
+    allow read: if host(eventId) || (published(eventId) && event(eventId).access=='public' && resource.data.status=='approved' && resource.data.visibility=='public');
+    allow update, delete: if host(eventId);
+   }
+  }
+  match /{document=**} { allow read, write: if false; }
+ }
 }

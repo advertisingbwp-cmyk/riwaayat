@@ -4,32 +4,80 @@
   "buildCommand": "npm run build:staging",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/account", "destination": "/index.html" },
-    { "source": "/contact", "destination": "/index.html" },
-    { "source": "/privacy", "destination": "/index.html" },
-    { "source": "/terms", "destination": "/index.html" },
-    { "source": "/data-request", "destination": "/index.html" },
-    { "source": "/data-controls", "destination": "/index.html" },
-    { "source": "/preview/:id", "destination": "/index.html" },
-    { "source": "/blog", "destination": "/blog/index.html" },
-    { "source": "/blog/:slug", "destination": "/blog/:slug/index.html" },
-    { "source": "/edit/:id", "destination": "/index.html" },
-    { "source": "/draft/:id", "destination": "/index.html" },
-    { "source": "/invite/:id", "destination": "/index.html" },
-    { "source": "/responses/:id", "destination": "/index.html" }
+    {
+      "source": "/account",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/data-request",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/data-controls",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/preview/:id",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog/index.html"
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/blog/:slug/index.html"
+    },
+    {
+      "source": "/edit/:id",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/draft/:id",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/invite/:id",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/responses/:id",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
       ]
     },
     {
-      "source": "/(account|draft|edit|responses|data-controls|data-request)(.*)",
+      "source": "/(account|draft|edit|invite|responses|data-controls|data-request)(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        }
       ]
     }
   ]

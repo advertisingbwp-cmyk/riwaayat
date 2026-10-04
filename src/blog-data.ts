@@ -30,7 +30,7 @@ export const blogPosts: BlogPost[] = [
     readTime: '5 min read',
     excerpt: 'Paper cards are expensive and can’t update when venues change. Here is why modern couples are pairing digital invitation websites with intimate keepsakes.',
     content: {
-      intro: 'A couple we spoke to spent over 40,000 rupees on gold-embossed paper cards. Two weeks before the Nikah, their venue changed to accommodate more guests. All 250 cards were already printed and delivered. In the end, they messaged everyone the new address on WhatsApp anyway. That story illustrates why more couples are sending interactive invitation websites instead of paper alone: a website stays accurate until the celebration begins.',
+      intro: 'Imagine a couple spending 40,000 rupees on gold-embossed paper cards. Two weeks before the Nikah, their venue changed to accommodate more guests. All 250 cards were already printed and delivered. In the end, they messaged everyone the new address on WhatsApp anyway. That story illustrates why more couples are sending interactive invitation websites instead of paper alone: a website stays accurate until the celebration begins.',
       sections: [
         {
           heading: '1. The Cost Breakdown: Per-Unit vs One Flat Experience',

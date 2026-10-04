@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import esbuild from 'esbuild';
+import {pathToFileURL} from 'node:url';
 
 const DIST_DIR = path.resolve('dist');
 const BASE_HTML = path.join(DIST_DIR, 'index.html');
@@ -15,6 +16,14 @@ const tsSource = fs.readFileSync('src/blog-data.ts', 'utf8');
 const { code: jsCode } = await esbuild.transform(tsSource, { loader: 'ts' });
 const mod = await import('data:text/javascript;base64,' + Buffer.from(jsCode).toString('base64'));
 const blogPosts = mod.blogPosts;
+
+// Render actual article bodies as well as metadata for no-JavaScript readers.
+const renderer = await esbuild.build({stdin:{contents: `import React from 'react'; import {renderToString} from 'react-dom/server'; import Blog from './src/Blog.tsx'; export const renderBlog=(slug)=>renderToString(React.createElement(Blog,{slug}));`,resolveDir:process.cwd(),loader:'tsx'},bundle:true,platform:'node',format:'esm',packages:'external',loader:{'.css':'empty'},write:false});
+const rendererPath=path.resolve('.blog-render.mjs');
+fs.writeFileSync(rendererPath,renderer.outputFiles[0].text);
+let renderBlog;
+try { ({renderBlog}=await import(pathToFileURL(rendererPath).href)); } finally { fs.unlinkSync(rendererPath); }
+function withBody(html,slug){return html.replace('<div id="root"></div>',`<div id="root">${renderBlog(slug)}</div>`);}
 
 const baseHtmlContent = fs.readFileSync(BASE_HTML, 'utf8');
 
@@ -70,7 +79,7 @@ function replaceMeta(html, {
   result = result.replace(/<meta name="twitter:image" content=".*?"\s*\/?>/i, `<meta name="twitter:image" content="${image}"/>`);
 
   // Inject or replace JSON-LD
-  const jsonLdScript = `\n  <script type="application/ld+json">\n${JSON.stringify(jsonLd, null, 2)}\n  </script>`;
+  const jsonLdScript = `\n  <script id="page-ld-json" type="application/ld+json">\n${JSON.stringify(jsonLd, null, 2).replace(/</g,'\\u003c')}\n  </script>`;
   result = result.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/i, jsonLdScript);
 
   return result;
@@ -111,7 +120,7 @@ const blogHubHtml = replaceMeta(baseHtmlContent, {
   }
 });
 
-fs.writeFileSync(path.join(blogHubDir, 'index.html'), blogHubHtml);
+fs.writeFileSync(path.join(blogHubDir, 'index.html'), withBody(blogHubHtml));
 console.log('✓ Generated static /blog/index.html');
 
 // 2. Generate each /blog/:slug article page
@@ -130,15 +139,12 @@ for (const post of blogPosts) {
     url: postUrl,
     image: postImage,
     type: 'article',
-    publishedTime: '2026-09-01T08:00:00Z',
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'Article',
       headline: post.title,
       description: post.excerpt,
       image: [postImage],
-      datePublished: '2026-09-01T08:00:00+00:00',
-      dateModified: '2026-09-29T11:00:00+00:00',
       author: {
         '@type': 'Organization',
         name: 'Riwaayat',
@@ -159,7 +165,7 @@ for (const post of blogPosts) {
     }
   });
 
-  fs.writeFileSync(path.join(postDir, 'index.html'), articleHtml);
+  fs.writeFileSync(path.join(postDir, 'index.html'), withBody(articleHtml,post.slug));
   console.log(`✓ Generated static /blog/${post.slug}/index.html`);
 }
 

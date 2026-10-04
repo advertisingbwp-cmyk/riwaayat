@@ -7,3 +7,5 @@ dist/
 .firebase/
 *-debug.log
 functions/node_modules/
+.blog-render.mjs
+.store-test.mjs

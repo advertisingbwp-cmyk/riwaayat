@@ -14,7 +14,7 @@ export default function SavedInvitation({id,owner=false}:{id:string;owner?:boole
  useEffect(()=>{
   if(!services){setBusy(false);return;}
   let active=true,epoch=0;
-  setEvent(null);setError('');setBusy(true);
+  setEvent(null);setAccess(null);setLocked(false);setError('');setBusy(true);
   async function display(template:InvitationEvent['id'],content:Content,images:Record<string,string>={},expected=epoch){
    if(active&&expected===epoch){
      const inv = toInvitation(template,content,images);
@@ -41,10 +41,12 @@ export default function SavedInvitation({id,owner=false}:{id:string;owner?:boole
       return;
      }
      try{
-      const decrypted=await decryptPayload<{content:Content;images?:Record<string,string>}>(passcode,data.encryptedPayload as EncryptedPayload);
+      const decrypted=await decryptPayload<{content:Content;images?:Record<string,string>;photoIds?:string[];guestToken?:string}>(passcode,data.encryptedPayload as EncryptedPayload);
       setLocked(false);
-      setAccess({id,token:id,rsvpOpen:data.guestSettings?.rsvpOpen!==false,guestbookOpen:data.guestSettings?.guestbookOpen!==false});
-      await display(data.templateId,decrypted.content,decrypted.images||{});
+      const images=decrypted.images||{};
+      for(const photoId of decrypted.photoIds||[]){const photo=await getDoc(doc(services!.db,'events',id,'photos',photoId));if(!photo.exists())throw new Error('Photo missing');images[photoId]=await decryptPayload<string>(passcode,photo.data().encryptedPayload);}
+      setAccess({id,token:decrypted.guestToken||'',private:true,rsvpOpen:!!decrypted.guestToken&&data.guestSettings?.rsvpOpen!==false,guestbookOpen:!!decrypted.guestToken&&data.guestSettings?.guestbookOpen!==false});
+      await display(data.templateId,decrypted.content,images);
      }catch(err){
       setLocked(true);
       setError('Passcode incorrect. Please check and try again.');
@@ -52,7 +54,7 @@ export default function SavedInvitation({id,owner=false}:{id:string;owner?:boole
      }
     }else{
      setLocked(false);
-     setAccess({id,token:id,rsvpOpen:data.guestSettings?.rsvpOpen!==false,guestbookOpen:data.guestSettings?.guestbookOpen!==false});
+     setAccess({id,token:'',private:false,rsvpOpen:data.guestSettings?.rsvpOpen!==false,guestbookOpen:data.guestSettings?.guestbookOpen!==false});
      if(data.content&&data.templateId){
       const images:Record<string,string>={};
       const photoIds=[...new Set([data.content.imagePhotoId,data.content.venuePhotoId,...(data.content.galleryPhotoIds||[])].filter((p):p is string=>!!p))];
