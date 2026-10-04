@@ -50,14 +50,14 @@ export const invitationEvents: InvitationEvent[] = [
   {
     id:'sahar',name:'Sahar',category:'Nikah & Walima',mood:'From a quiet evening to a lifetime of light.',
     couple:'Daniyal & Inaya',note:'Together with our families, we invite you to an evening of love, laughter and new beginnings.',
-    image:'/images/royal-2.webp',startsAt:'2027-02-14T17:30:00+05:00',timeZone:'Asia/Karachi',
+    image:'/images/sahar-cover.webp',imagePosition:'72% center',startsAt:'2027-02-14T17:30:00+05:00',timeZone:'Asia/Karachi',
     intro:'Every beautiful beginning has its own light.',quote:'And then, every ordinary day became a little more extraordinary.',
     hashtag:'#DaniyalAndInaya',dressCode:'Midnight blue, warm ivory & a touch of silver',instrument:'Piano',particle:'stars',
     venue:{name:'The Sahar Terrace',address:'Islamabad, Pakistan · fictional sample venue',mapQuery:'Islamabad Pakistan'},
-    venueImage:'/images/noor-3.webp',
+    venueImage:'/images/sahar-venue.webp',
     story:[{year:'2022',title:'The first hello',text:'One conversation became another. Somewhere between the laughter and the long walks, we found a familiar kind of peace.'},{year:'2025',title:'Choosing each other',text:'Through changing seasons and everyday adventures, our favourite place became wherever we were together.'},{year:'2027',title:'A new dawn',text:'Now we begin a new chapter, surrounded by the people who have been part of our story all along.'}],
     ceremonies:[{id:'welcome',title:'Golden hour welcome',startsAt:'2027-02-14T17:30:00+05:00',place:'The terrace',attire:'Midnight blue & ivory'},{id:'nikah',title:'Our Nikah',startsAt:'2027-02-14T18:00:00+05:00',place:'The garden pavilion',attire:'Elegant occasion wear'},{id:'dinner',title:'Dinner beneath the stars',startsAt:'2027-02-14T19:30:00+05:00',place:'The Sahar Terrace',attire:'Stay for the evening'}],
-    gallery:[{src:'/images/royal-1.webp',alt:'Sample wedding celebration photograph'},{src:'/images/noor-2.webp',alt:'Sample evening celebration photograph'},{src:'/images/noor-3.webp',alt:'Sample celebration setting'},{src:'/images/royal-4.webp',alt:'Sample wedding detail photograph'}],
+    gallery:[{src:'/images/sahar-1.webp',alt:'AI-generated ivory bridal bouquet on midnight-blue silk'},{src:'/images/sahar-2.webp',alt:'AI-generated newlywed hands with ivory and navy embroidered sleeves'},{src:'/images/sahar-3.webp',alt:'AI-generated candlelit reception table'},{src:'/images/sahar-4.webp',alt:'AI-generated jasmine wedding arch at twilight'}],
   },
 ];
 
