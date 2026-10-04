@@ -50,18 +50,6 @@ export function Invitation({event,sample=true,ownerPreview=false,responseSection
         <button
           className="inv-preview-cta"
           onClick={() => location.assign(`/edit/try-${event.id}`)}
-          style={{
-            marginLeft: 'auto',
-            background: '#d4af37',
-            color: '#1a1815',
-            border: 'none',
-            padding: '6px 14px',
-            borderRadius: '999px',
-            fontWeight: 600,
-            fontSize: '0.82rem',
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.12)'
-          }}
         >
           Customise this design ↗
         </button>
