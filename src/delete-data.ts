@@ -8,7 +8,7 @@ export async function deleteInvitation(db:Firestore,uid:string,id:string){
  const owner=await getDoc(ownerRef);if(!owner.exists())throw new Error('Invitation not found.');
  const published=await getDoc(publicRef);
  const lock=writeBatch(db);if(!owner.data().deleting)lock.update(ownerRef,{deleting:true});if(published.exists())lock.update(publicRef,{status:'draft'});await lock.commit();
- for(const sub of ['photos','rsvps','guestbook','quizAttempts']){if(published.exists())await clearCollection(db,`events/${id}/${sub}`);await clearCollection(db,`${root}/${sub}`);}
+ for(const sub of ['photos','rsvps','guestbook']){if(published.exists())await clearCollection(db,`events/${id}/${sub}`);await clearCollection(db,`${root}/${sub}`);}
  const finish=writeBatch(db);if(published.exists())finish.delete(publicRef);finish.delete(ownerRef);await finish.commit();
 }
 export async function deleteSelectedData(db:Firestore,user:User,scope:'invitation'|'account',id:string){

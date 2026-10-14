@@ -3,7 +3,7 @@ import {collection,doc,onSnapshot,setDoc,serverTimestamp,query,where} from 'fire
 import {services,emulatorMode} from './firebase';
 import './responses.css';
 import type {InvitationEvent} from './events';
-export type GuestAccess={id:string;token:string;private:boolean;rsvpOpen:boolean;guestbookOpen:boolean;quizOpen:boolean};
+export type GuestAccess={id:string;token:string;private:boolean;rsvpOpen:boolean;guestbookOpen:boolean};
 type Entry={id:string;displayName:string;message:string};
 export function responseError(error:unknown){const code=(error as {code?:string}).code||'';if(code.includes('permission-denied'))return 'Your guest access expired or the invitation changed. Reopen the invitation before sending; your current text is still here.';if(code.includes('failed-precondition'))return 'Submissions are closed or this request cannot be processed yet. Your text has been kept.';if(code.includes('invalid-argument'))return 'Check the form and select at least one listed ceremony when attending.';if(code.includes('resource-exhausted'))return 'The submission limit was reached. Wait a minute or contact your host.';return 'Your submission could not be confirmed. Please retry the same details.';}
 export function GuestResponses({event,access}:{event:InvitationEvent;access:GuestAccess}){

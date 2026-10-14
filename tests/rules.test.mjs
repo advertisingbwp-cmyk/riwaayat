@@ -17,13 +17,11 @@ const ownerPath='owners/alice/events/event-a',eventPath='events/event-a';
 const content={couple:'Private names',imagePhotoId:'photo-0',venuePhotoId:null,galleryPhotoIds:['photo-1','photo-2','photo-3','photo-4','photo-5'],ceremonies:[{id:'nikah',title:'Nikah'}]};
 const rsvp=id=>({id,name:'Guest',attendance:'yes',partySize:2,meal:'Halal',ceremonies:['nikah'],note:'',createdAt:serverTimestamp()});
 const note=(id,visibility)=>({id,displayName:'Guest',message:'Congratulations',status:'pending',consent:true,visibility,createdAt:serverTimestamp()});
-const quiz={enabled:true,open:true,title:'How well do you know us?',intro:'A quick game',questions:[{id:'q1',prompt:'Where did we meet?',options:[{id:'o1',text:'Lahore'},{id:'o2',text:'Karachi'}],correctOptionId:'o1'}]};
-const attempt=(id,score=1,optionId='o1')=>({id,displayName:'Quiz Guest',answers:[{questionId:'q1',optionId}],score,questionCount:1,consent:true,createdAt:serverTimestamp()});
 async function adminUpdate(path,data){await env.withSecurityRulesDisabled(c=>updateDoc(doc(c.firestore(),path),data));}
 try{
  await env.clearFirestore();
  await env.withSecurityRulesDisabled(async c=>{
-  await setDoc(doc(c.firestore(),ownerPath),{id:'event-a',ownerId:'alice',templateId:'royal',title:'Test',content,quiz,status:'draft',revision:1});
+  await setDoc(doc(c.firestore(),ownerPath),{id:'event-a',ownerId:'alice',templateId:'royal',title:'Test',content,status:'draft',revision:1});
   for(let i=0;i<6;i++)await setDoc(doc(c.firestore(),`${ownerPath}/photos/photo-${i}`),{id:`photo-${i}`,path:'data:image/webp;base64,'+'A'.repeat(260000),status:'ready'});
  });
  await test('private drafts require verified ownership; missing public record is readable by its owner',async()=>{
@@ -44,16 +42,6 @@ try{
   await assertFails(getDoc(doc(bob,`${eventPath}/rsvps/r1`)));
   await assertFails(setDoc(doc(guest,`${eventPath}/rsvps/bad`),{...rsvp('bad'),partySize:999}));
   await assertFails(setDoc(doc(guest,`${eventPath}/rsvps/backdate`),{...rsvp('backdate'),createdAt:new Date(0)}));
- });
- await test('quiz score is checked against the private answer key and attempts stay host-only',async()=>{
-  await assertSucceeds(setDoc(doc(guest,`${eventPath}/quizAttempts/a1`),attempt('a1',1,'o1')));
-  await assertSucceeds(getDoc(doc(alice,`${eventPath}/quizAttempts/a1`)));
-  await assertFails(getDoc(doc(guest,`${eventPath}/quizAttempts/a1`)));
-  await assertFails(setDoc(doc(guest,`${eventPath}/quizAttempts/wrong-score`),attempt('wrong-score',0,'o1')));
-  await assertFails(setDoc(doc(guest,`${eventPath}/quizAttempts/bad-option`),attempt('bad-option',0,'invented')));
-  await adminUpdate(ownerPath,{'quiz.open':false});
-  await assertFails(setDoc(doc(guest,`${eventPath}/quizAttempts/closed-quiz`),attempt('closed-quiz',1,'o1')));
-  await adminUpdate(ownerPath,{'quiz.open':true});
  });
  await test('approved query works without exposing pending guestbook entries',async()=>{
   await assertSucceeds(setDoc(doc(guest,`${eventPath}/guestbook/n1`),note('n1','public')));

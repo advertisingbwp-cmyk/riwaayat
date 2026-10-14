@@ -1,7 +1,7 @@
 export type Instrument = 'Sitar' | 'Guitar' | 'Oud' | 'Piano';
 export type InvitationEvent = {
   effects?: {opening:boolean;particles:boolean;music:boolean;scratch:boolean};
-  id: 'royal' | 'noor' | 'bloom' | 'sahar' | 'mehr' | 'quiz'; name: string; category: string; mood: string;
+  id: 'royal' | 'noor' | 'bloom' | 'sahar' | 'mehr'; name: string; category: string; mood: string;
   couple: string; note: string; image: string; startsAt: string; timeZone: string;
   intro: string; quote: string; hashtag: string; dressCode: string; instrument: Instrument;
   particle: 'petals' | 'stars' | 'leaves'; venue: {name: string; address: string; mapQuery: string};
@@ -70,17 +70,6 @@ export const invitationEvents: InvitationEvent[] = [
     story:[{year:'2023',title:'A hello worth keeping',text:'At a family gathering, a shared joke turned into a conversation neither of us wanted to end.'},{year:'2025',title:'Our favourite everyday',text:'Long walks, little notes and cups of chai. Somehow the smallest moments became the ones that mattered most.'},{year:'2027',title:'Here comes our forever',text:'Now we are gathering our favourite people for a day full of warmth, gratitude and a little happy chaos.'}],
     ceremonies:[{id:'welcome',title:'Chai & happy hellos',startsAt:'2027-03-21T16:00:00+05:00',place:'The garden entrance',attire:'Peach, ivory & warm smiles'},{id:'nikah',title:'The forever part',startsAt:'2027-03-21T17:00:00+05:00',place:'The courtyard',attire:'Modest festive wear'},{id:'dinner',title:'A table for everyone',startsAt:'2027-03-21T18:30:00+05:00',place:'Under the fairy lights',attire:'Stay comfortable, stay a little longer'}],
     gallery:[{src:'/images/mehr-1.webp',alt:'AI-generated marigolds in terracotta vases'},{src:'/images/mehr-2.webp',alt:'AI-generated wedding envelope exchanged by a couple'},{src:'/images/mehr-3.webp',alt:'AI-generated golden-hour courtyard wedding table'}],
-  },
-  {
-    id:'quiz',name:'Couple Quiz',category:'Interactive invitation',mood:'Invite your people to play along with your love story.',
-    couple:'Ayesha & Hamza',note:'You know our story — or do you? Join our celebration and put your memories to the test.',
-    image:'/images/couple-quiz.svg',startsAt:'2027-04-18T18:00:00+05:00',timeZone:'Asia/Karachi',
-    intro:'An invitation with a playful little challenge.',quote:'The best stories are the ones our favourite people remember with us.',
-    hashtag:'#AyeshaAndHamza',dressCode:'Festive jewel tones & your brightest smile',instrument:'Piano',particle:'stars',
-    venue:{name:'The Story Garden',address:'Lahore, Punjab, Pakistan · fictional sample venue',mapQuery:'Lahore Pakistan'},
-    venueImage:'/images/couple-quiz.svg',story:[],
-    ceremonies:[{id:'welcome',title:'Welcome & quiz hour',startsAt:'2027-04-18T18:00:00+05:00',place:'The Story Garden',attire:'Festive jewel tones'},{id:'dinner',title:'Dinner & celebration',startsAt:'2027-04-18T19:30:00+05:00',place:'Garden courtyard',attire:'Stay for the stories'}],
-    gallery:[],effects:{opening:true,particles:true,music:true,scratch:false},
   },
 ];
 

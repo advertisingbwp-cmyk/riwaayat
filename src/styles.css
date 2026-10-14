@@ -7,5 +7,3 @@
 .motion-paused .envelope-float,.envelope-area:focus-within .envelope-float,.envelope-area:hover .envelope-float{animation-play-state:paused}.motion-paused .envelope{transform:rotate(-8deg) rotateX(12deg) rotateY(-9deg)}.motion-toggle{position:absolute;bottom:-28px;right:0;font-size:8px;letter-spacing:.5px;border:0;border-bottom:1px solid #b7ac95;padding:5px 0;background:transparent;color:#6b604b}
 .envelope-back{z-index:1}.letter{z-index:2}.envelope-pocket{z-index:3}.envelope-flap{z-index:4}.wax-seal{z-index:6}.envelope-address{z-index:5}.is-open .envelope-flap{z-index:0}.hero-copy,.envelope-area{min-width:0}
 @media(max-width:540px){.orbit-one{width:65%;height:65%}.orbit-two{width:60%;height:75%}.hero h1{font-size:clamp(40px,12.5vw,49px)}}
-
-.quiz .sample-card{background:#fff8e8f2;color:#4a173e;transform:rotate(3deg);border-radius:28px;box-shadow:12px 18px 0 #5a1f4f55,0 18px 45px #160b1b55}.quiz .sample-card>span:not(.sample-ornament){color:#4a173e}.quiz .sample-ornament{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#5a1f4f;color:#ffe9a9;font:italic 39px 'Cormorant Garamond',serif}.quiz .design-art>img{filter:saturate(.92)}
