@@ -1,4 +1,5 @@
 import { invitationEvents, type InvitationEvent } from './events';
+import type {QuizConfig} from './quiz-model';
 export type Content={
  couple:string;intro:string;note:string;quote:string;startsAt:string;timeZone:string;hashtag:string;dressCode:string;
  venue:InvitationEvent['venue'];story:InvitationEvent['story'];ceremonies:InvitationEvent['ceremonies'];
@@ -9,7 +10,7 @@ export type Content={
  galleryPhotoIds:string[];instrument:InvitationEvent['instrument'];particle:InvitationEvent['particle'];
  effects:{opening:boolean;particles:boolean;music:boolean;scratch:boolean};
 };
-export type SavedDraft={id:string;title:string;templateId:InvitationEvent['id'];content:Content|null;revision?:number;status:string;publishedRevision?:number;publishedAccess?:string;archived?:boolean};
+export type SavedDraft={id:string;title:string;templateId:InvitationEvent['id'];content:Content|null;quiz?:QuizConfig;revision?:number;status:string;publishedRevision?:number;publishedAccess?:string;archived?:boolean};
 export const blankContent=(template:InvitationEvent['id']):Content=>({couple:'',intro:'You are warmly invited',note:'',quote:'',startsAt:new Date(Date.now()+30*86400000).toISOString(),timeZone:'Asia/Karachi',hashtag:'',dressCode:'',venue:{name:'',address:'',mapQuery:''},story:[],ceremonies:[],imagePhotoId:null,venuePhotoId:null,imagePosition:'50% 50%',venueImagePosition:'50% 50%',galleryPhotoIds:[],instrument:invitationEvents.find(e=>e.id===template)!.instrument,particle:invitationEvents.find(e=>e.id===template)!.particle,effects:{opening:true,particles:true,music:true,scratch:true}});
 export function toInvitation(template:InvitationEvent['id'],content:Content,images:Record<string,string>):InvitationEvent {
  const fallback='/images/invitation-placeholder.svg';

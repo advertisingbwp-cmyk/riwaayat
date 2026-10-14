@@ -34,6 +34,7 @@ Open http://127.0.0.1:5173/. Build with `npm run build`; inspect the production 
 
 ## Implemented
 
+- Dedicated Couple Quiz invitation: hosts create 1–10 questions with 2–4 choices, guests open the invitation and play without an account, and private scores appear in the response dashboard with answer review, deletion, open/close controls and CSV export. The other invitation templates do not include the quiz. Published question payloads omit the private answer key; Firestore rules verify the submitted score.
 - Responsive ivory/plum homepage and mobile navigation.
 - A pinned, scroll-driven 3D story: camera approach, floating seal release, folding flap, invitation extraction and a three-design fan reveal.
 - Four changing copy chapters, progress indicators, skip link and animation-off/static alternative.

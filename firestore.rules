@@ -27,6 +27,42 @@ service cloud.firestore {
     && d.message is string && d.message.size()>0 && d.message.size()<=800
     && d.visibility in ['public','private'] && d.status=='pending' && d.consent==true && d.createdAt==request.time;
   }
+  function privateQuiz(id) {
+   let e=event(id);
+   return get(/databases/$(database)/documents/owners/$(e.ownerId)/events/$(id)).data.quiz;
+  }
+  function validQuizOption(question,answer) {
+   return question.options.size()>=2 && question.options.size()<=4
+    && (answer.optionId==question.options[0].id || answer.optionId==question.options[1].id
+     || (question.options.size()>2 && answer.optionId==question.options[2].id)
+     || (question.options.size()>3 && answer.optionId==question.options[3].id));
+  }
+  function validQuizAnswer(quiz,answer,index) {
+   return quiz.questions.size()<=index || (answer.keys().hasOnly(['questionId','optionId']) && answer.questionId==quiz.questions[index].id && validQuizOption(quiz.questions[index],answer));
+  }
+  function quizPoint(quiz,answers,index) {
+   return quiz.questions.size()<=index ? 0 : (answers[index].optionId==quiz.questions[index].correctOptionId ? 1 : 0);
+  }
+  function validQuizAttempt(id,attemptId) {
+   let d=request.resource.data;
+   let quiz=privateQuiz(id);
+   return quiz.enabled==true && quiz.open==true && quiz.questions.size()>=1 && quiz.questions.size()<=10
+    && d.keys().hasOnly(['id','displayName','answers','score','questionCount','consent','createdAt','guestToken'])
+    && d.id==attemptId && d.displayName is string && d.displayName.size()>0 && d.displayName.size()<=60
+    && d.consent==true && d.createdAt==request.time && d.questionCount==quiz.questions.size()
+    && d.answers is list && d.answers.size()==quiz.questions.size() && d.score is int && d.score>=0 && d.score<=quiz.questions.size()
+    && validQuizAnswer(quiz,d.answers[0],0)
+    && (quiz.questions.size()<2 || validQuizAnswer(quiz,d.answers[1],1))
+    && (quiz.questions.size()<3 || validQuizAnswer(quiz,d.answers[2],2))
+    && (quiz.questions.size()<4 || validQuizAnswer(quiz,d.answers[3],3))
+    && (quiz.questions.size()<5 || validQuizAnswer(quiz,d.answers[4],4))
+    && (quiz.questions.size()<6 || validQuizAnswer(quiz,d.answers[5],5))
+    && (quiz.questions.size()<7 || validQuizAnswer(quiz,d.answers[6],6))
+    && (quiz.questions.size()<8 || validQuizAnswer(quiz,d.answers[7],7))
+    && (quiz.questions.size()<9 || validQuizAnswer(quiz,d.answers[8],8))
+    && (quiz.questions.size()<10 || validQuizAnswer(quiz,d.answers[9],9))
+    && d.score==quizPoint(quiz,d.answers,0)+quizPoint(quiz,d.answers,1)+quizPoint(quiz,d.answers,2)+quizPoint(quiz,d.answers,3)+quizPoint(quiz,d.answers,4)+quizPoint(quiz,d.answers,5)+quizPoint(quiz,d.answers,6)+quizPoint(quiz,d.answers,7)+quizPoint(quiz,d.answers,8)+quizPoint(quiz,d.answers,9);
+  }
   match /owners/{uid}/events/{eventId} {
    allow read, delete: if verified(uid);
    allow create: if verified(uid) && request.resource.data.ownerId==uid;
@@ -60,6 +96,11 @@ service cloud.firestore {
     allow create: if guestAllowed(eventId) && event(eventId).guestSettings.guestbookOpen==true && validNote(entryId) && request.resource.data.visibility==(event(eventId).access=='public'?'public':'private');
     allow read: if host(eventId) || (published(eventId) && event(eventId).access=='public' && resource.data.status=='approved' && resource.data.visibility=='public');
     allow update, delete: if host(eventId);
+   }
+   match /quizAttempts/{attemptId} {
+    allow create: if guestAllowed(eventId) && validQuizAttempt(eventId,attemptId);
+    allow read, delete: if host(eventId);
+    allow update: if false;
    }
   }
   match /{document=**} { allow read, write: if false; }

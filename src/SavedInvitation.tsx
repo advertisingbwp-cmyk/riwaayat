@@ -7,14 +7,16 @@ import {GuestResponses,type GuestAccess} from './GuestResponses';
 import {toInvitation,type Content,type SavedDraft} from './editor-model';
 import {decryptPayload,type EncryptedPayload} from './crypto-payload';
 import type {InvitationEvent} from './events';
+import {GuestQuiz} from './GuestQuiz';
+import type {PublicQuiz} from './quiz-model';
 import './account.css';
 export default function SavedInvitation({id,owner=false}:{id:string;owner?:boolean}){
  const [access,setAccess]=useState<GuestAccess|null>(null);
- const [event,setEvent]=useState<InvitationEvent|null>(null),[locked,setLocked]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(true),[passcode,setPasscode]=useState(''),[attempt,setAttempt]=useState(0);
+ const [event,setEvent]=useState<InvitationEvent|null>(null),[quiz,setQuiz]=useState<PublicQuiz|null>(null),[locked,setLocked]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(true),[passcode,setPasscode]=useState(''),[attempt,setAttempt]=useState(0);
  useEffect(()=>{
   if(!services){setBusy(false);return;}
   let active=true,epoch=0;
-  setEvent(null);setAccess(null);setLocked(false);setError('');setBusy(true);
+  setEvent(null);setQuiz(null);setAccess(null);setLocked(false);setError('');setBusy(true);
   async function display(template:InvitationEvent['id'],content:Content,images:Record<string,string>={},expected=epoch){
    if(active&&expected===epoch){
      const inv = toInvitation(template,content,images);
@@ -41,11 +43,11 @@ export default function SavedInvitation({id,owner=false}:{id:string;owner?:boole
       return;
      }
      try{
-      const decrypted=await decryptPayload<{content:Content;images?:Record<string,string>;photoIds?:string[];guestToken?:string}>(passcode,data.encryptedPayload as EncryptedPayload);
+      const decrypted=await decryptPayload<{content:Content;images?:Record<string,string>;photoIds?:string[];guestToken?:string;quiz?:PublicQuiz}>(passcode,data.encryptedPayload as EncryptedPayload);
       setLocked(false);
       const images=decrypted.images||{};
       for(const photoId of decrypted.photoIds||[]){const photo=await getDoc(doc(services!.db,'events',id,'photos',photoId));if(!photo.exists())throw new Error('Photo missing');images[photoId]=await decryptPayload<string>(passcode,photo.data().encryptedPayload);}
-      setAccess({id,token:decrypted.guestToken||'',private:true,rsvpOpen:!!decrypted.guestToken&&data.guestSettings?.rsvpOpen!==false,guestbookOpen:!!decrypted.guestToken&&data.guestSettings?.guestbookOpen!==false});
+      setQuiz(data.templateId==='quiz'?(decrypted.quiz||null):null);setAccess({id,token:decrypted.guestToken||'',private:true,rsvpOpen:!!decrypted.guestToken&&data.guestSettings?.rsvpOpen!==false,guestbookOpen:!!decrypted.guestToken&&data.guestSettings?.guestbookOpen!==false,quizOpen:!!decrypted.guestToken&&data.guestSettings?.quizOpen!==false});
       await display(data.templateId,decrypted.content,images);
      }catch(err){
       setLocked(true);
@@ -54,7 +56,7 @@ export default function SavedInvitation({id,owner=false}:{id:string;owner?:boole
      }
     }else{
      setLocked(false);
-     setAccess({id,token:'',private:false,rsvpOpen:data.guestSettings?.rsvpOpen!==false,guestbookOpen:data.guestSettings?.guestbookOpen!==false});
+     setQuiz(data.templateId==='quiz'?(data.quiz||null):null);setAccess({id,token:'',private:false,rsvpOpen:data.guestSettings?.rsvpOpen!==false,guestbookOpen:data.guestSettings?.guestbookOpen!==false,quizOpen:data.guestSettings?.quizOpen!==false});
      if(data.content&&data.templateId){
       const images:Record<string,string>={};
       const photoIds=[...new Set([data.content.imagePhotoId,data.content.venuePhotoId,...(data.content.galleryPhotoIds||[])].filter((p):p is string=>!!p))];
@@ -101,6 +103,6 @@ export default function SavedInvitation({id,owner=false}:{id:string;owner?:boole
   }else void guest();
   return()=>{active=false;epoch++;unsubscribe();};
  },[id,owner,attempt]);
- if(event)return <>{owner&&<div className="account-banner"><a href={`/edit/${id}`}>← Return to editor</a> · Saved private preview</div>}<Invitation event={event} sample={false} ownerPreview={owner} responseSection={!owner&&access?<GuestResponses event={event} access={access}/>:undefined}/></>;
+ if(event)return <>{owner&&<div className="account-banner"><a href={`/edit/${id}`}>← Return to editor</a> · Saved private preview</div>}<Invitation event={event} sample={false} ownerPreview={owner} responseSection={!owner&&access?<>{event.id==='quiz'&&quiz?.enabled&&<GuestQuiz quiz={{...quiz,open:quiz.open&&access.quizOpen}} access={access}/>}<GuestResponses event={event} access={access}/></>:undefined}/></>;
  return <div className="account-page"><main><a href={owner?`/edit/${id}`:'/'}>← {owner?'Return to editor':'Riwaayat'}</a><h1>{locked?'An invitation just for you.':'Your invitation.'}</h1>{configurationError&&<p>{configurationError}</p>}{busy&&<p role="status">Opening invitation…</p>}{error&&<p role="alert" className="account-error">{error}</p>}{locked?<form className="account-panel" onSubmit={(e:FormEvent)=>{e.preventDefault();setAttempt(n=>n+1);}}><label>Guest passcode<input type="password" required maxLength={128} autoComplete="off" value={passcode} onChange={e=>setPasscode(e.target.value)}/></label><button className="button primary" disabled={busy}>Open invitation</button></form>:error&&<button className="button primary" disabled={busy} onClick={()=>setAttempt(n=>n+1)}>Try again</button>}</main></div>;
 }
